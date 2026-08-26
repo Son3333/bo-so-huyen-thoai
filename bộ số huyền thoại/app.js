@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRunPrediction = document.getElementById('btnRunPrediction');
     const btnRunText = document.getElementById('btnRunText');
     const btnClearInput = document.getElementById('btnClearInput');
-    const btnUnlockDay = document.getElementById('btnUnlockDay');
     const btnCopyFullSlip = document.getElementById('btnCopyFullSlip');
     const btnPrintSlip = document.getElementById('btnPrintSlip');
 
@@ -340,25 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Unlock button handler
-    btnUnlockDay.addEventListener('click', () => {
-        const selectedDate = inputDrawDate.value || todayVN;
-        const lockedDays = getLockedDays();
-
-        if (!lockedDays[selectedDate]) {
-            showToast("Kỳ này chưa bị khóa.");
-            return;
-        }
-
-        if (confirm(`Bạn có chắc chắn muốn MỞ KHÓA kỳ quay ngày ${selectedDate} để nhập lại kết quả không?`)) {
-            delete lockedDays[selectedDate];
-            localStorage.setItem('bo_so_locked_days', JSON.stringify(lockedDays));
-            populateQuickHistorySelect();
-            checkDailyLockStatus();
-            showToast(`🔓 Đã mở khóa kỳ ngày ${selectedDate}. Bạn có thể nhập lại!`);
-        }
-    });
-
     // --- CHECK MYSQL STATUS ---
     checkMySQLStatus();
     function checkMySQLStatus() {
@@ -504,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (e) {}
 
-            alert("Chưa thể kết nối tới nguồn cào trực tiếp. Vui lòng kiểm tra lại sau hoặc dán kết quả 27 giải vào ô nhập.");
+            showToast("Chưa thể kết nối tới nguồn cào trực tiếp. Vui lòng kiểm tra lại sau hoặc dán kết quả 27 giải vào ô nhập.", "warning");
         });
     }
 
@@ -524,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quickCountBadge.textContent = `Đã nhận: 0 số`;
         const inputs = fullBoardContainer.querySelectorAll('input');
         inputs.forEach(i => i.value = '');
-        showToast("Đã xóa trắng bảng nhập liệu");
+        showToast("Đã xóa trắng bảng nhập liệu", "info");
     });
 
     // --- MAIN PREDICTION & IDEMPOTENT LOCK HANDLER ---
@@ -536,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lockedDays[selectedDate]) {
             renderLockedPrediction(lockedDays[selectedDate]);
-            showToast(`🔒 Ngày ${selectedDate} đã được chốt số cố định từ trước! Hiển thị lại bản chốt.`);
+            showToast(`🔒 Ngày ${selectedDate} đã được chốt số cố định từ trước! Hiển thị lại bản chốt.`, "info");
             return;
         }
 
@@ -548,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentMode === 'quick') {
             const txt = quickInputText.value.trim();
             if (!txt) {
-                alert("Vui lòng nhập hoặc dán dãy số lô đã về!");
+                showToast("Vui lòng nhập hoặc dán dãy số lô đã về!", "warning");
                 return;
             }
             lottoNumbers = engine.parseQuickInput(txt);
@@ -566,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (lottoNumbers.length === 0) {
-            alert("Không nhận diện được số lô hợp lệ. Vui lòng kiểm tra lại!");
+            showToast("Không nhận diện được số lô hợp lệ. Vui lòng kiểm tra lại!", "error");
             return;
         }
 
@@ -1032,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
             runPrediction();
         }
         if (!lastInputData) {
-            alert("Vui lòng nhập kết quả xổ số trước khi lưu!");
+            showToast("Vui lòng nhập kết quả xổ số trước khi lưu!", "warning");
             return;
         }
 
@@ -1195,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetsRaw = ruleTargetNums.value.trim();
 
             if (!src || !targetsRaw) {
-                alert("Vui lòng điền đầy đủ số nguồn và các số báo!");
+                showToast("Vui lòng điền đầy đủ số nguồn và các số báo!", "warning");
                 return;
             }
 
@@ -1203,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formattedTargets = targetsRaw.split(/[^0-9]+/).filter(t => t.length > 0).map(t => engine.formatNum(t));
 
             if (formattedTargets.length === 0) {
-                alert("Vui lòng nhập ít nhất một số báo hợp lệ!");
+                showToast("Vui lòng nhập ít nhất một số báo hợp lệ!", "warning");
                 return;
             }
 
@@ -1219,11 +1199,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnResetRules) {
         btnResetRules.addEventListener('click', () => {
-            if (confirm("Bạn có chắc chắn muốn khôi phục toàn bộ quy tắc bạc nhớ về mặc định không?")) {
+            showCyberConfirm("Bạn có chắc chắn muốn khôi phục toàn bộ quy tắc bạc nhớ về mặc định không?", () => {
                 customRules = JSON.parse(JSON.stringify(DEFAULT_RULES));
                 saveRulesToStorage(customRules);
-                showToast("Đã khôi phục quy tắc gốc thành công!");
-            }
+                showToast("Đã khôi phục quy tắc gốc thành công!", "success");
+            });
         });
     }
 
@@ -1389,24 +1369,105 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClearHistory = document.getElementById('btnClearHistory');
     if (btnClearHistory) {
         btnClearHistory.addEventListener('click', () => {
-            if (confirm("Bạn có chắc muốn xóa sạch toàn bộ lịch sử không?")) {
+            showCyberConfirm("Bạn có chắc chắn muốn xóa sạch toàn bộ lịch sử không? Hành động này không thể hoàn tác.", () => {
                 localStorage.removeItem('bo_so_history');
                 localStorage.removeItem('bo_so_locked_days');
                 populateQuickHistorySelect();
                 renderHistoryList();
                 checkDailyLockStatus();
-                showToast("Đã xóa toàn bộ lịch sử!");
-            }
+                showToast("Đã xóa toàn bộ lịch sử!", "info");
+            });
         });
     }
 
-    function showToast(msg) {
-        const toast = document.createElement('div');
-        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs shadow-2xl animate-fade-in flex items-center space-x-2';
-        toast.innerHTML = `<span>⚡</span><span>${msg}</span>`;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
+    // --- CYBER CONFIRM MODAL DIALOG ---
+    function showCyberConfirm(message, onConfirm) {
+        const modal = document.getElementById('cyberConfirmModal');
+        const msgEl = document.getElementById('cyberConfirmMessage');
+        const btnOk = document.getElementById('btnCyberConfirmOk');
+        const btnCancel = document.getElementById('btnCyberConfirmCancel');
+        
+        if (!modal || !msgEl || !btnOk || !btnCancel) {
+            if (window.confirm(message)) onConfirm();
+            return;
+        }
+
+        msgEl.textContent = message;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        function cleanup() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            btnOk.removeEventListener('click', handleOk);
+            btnCancel.removeEventListener('click', handleCancel);
+        }
+
+        function handleOk() {
+            cleanup();
+            if (typeof onConfirm === 'function') onConfirm();
+        }
+
+        function handleCancel() {
+            cleanup();
+        }
+
+        btnOk.addEventListener('click', handleOk);
+        btnCancel.addEventListener('click', handleCancel);
     }
+
+    // --- UNIFIED CYBER TOAST NOTIFICATION SYSTEM ---
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        
+        let iconHtml = '⚡';
+        let typeClass = 'toast-info';
+        let iconBg = 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300';
+
+        if (type === 'warning') {
+            iconHtml = '⚠️';
+            typeClass = 'toast-warning';
+            iconBg = 'bg-amber-500/20 border-amber-500/40 text-amber-300';
+        } else if (type === 'error') {
+            iconHtml = '❌';
+            typeClass = 'toast-error';
+            iconBg = 'bg-rose-500/20 border-rose-500/40 text-rose-400';
+        } else if (type === 'success') {
+            iconHtml = '✅';
+            typeClass = 'toast-success';
+            iconBg = 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400';
+        }
+
+        toast.className = `cyber-toast ${typeClass}`;
+        toast.innerHTML = `
+            <div class="w-8 h-8 rounded-xl border flex items-center justify-center text-sm shrink-0 shadow-inner ${iconBg}">
+                ${iconHtml}
+            </div>
+            <div class="flex-1 text-xs text-gray-100 font-bold leading-snug">
+                ${msg}
+            </div>
+        `;
+        
+        if (container) {
+            container.appendChild(toast);
+        } else {
+            document.body.appendChild(toast);
+        }
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 15);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3200);
+    }
+
+    // Ghi đè alert mặc định của trình duyệt để 100% popup đều dùng Cyber Toast hiện đại
+    window.alert = function(msg) {
+        showToast(msg, 'warning');
+    };
 });
