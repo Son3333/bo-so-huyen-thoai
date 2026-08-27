@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastPredictionResult = null;
     let lastInputData = null;
     let lastFullBettingSlip = null;
-    const API_BASE = 'http://localhost:8080/api';
+    const API_BASE = (window.location.protocol.startsWith('http')) 
+        ? `${window.location.origin}/api` 
+        : 'http://localhost:8080/api';
 
     // --- DOM ELEMENTS ---
     const vnLiveClock = document.getElementById('vnLiveClock');
@@ -27,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRunPrediction = document.getElementById('btnRunPrediction');
     const btnRunText = document.getElementById('btnRunText');
     const btnClearInput = document.getElementById('btnClearInput');
-    const btnUnlockDay = document.getElementById('btnUnlockDay');
     const btnCopyFullSlip = document.getElementById('btnCopyFullSlip');
     const btnPrintSlip = document.getElementById('btnPrintSlip');
 
@@ -35,11 +36,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickHistorySelect = document.getElementById('quickHistorySelect');
     const btnViewSelectedHistory = document.getElementById('btnViewSelectedHistory');
 
-    // AI Evaluation Elements
+    // AI Evaluation Elements (4 Hạng Mục Đối Soát Toàn Diện)
+    const evalAccuracyBadge = document.getElementById('evalAccuracyBadge');
     const evalBTL = document.getElementById('evalBTL');
     const evalSTL = document.getElementById('evalSTL');
-    const evalDan4 = document.getElementById('evalDan4');
+    const evalDanLotto = document.getElementById('evalDanLotto');
+    const evalKep = document.getElementById('evalKep');
+    const evalXien2 = document.getElementById('evalXien2');
+    const evalXienQuay = document.getElementById('evalXienQuay');
+    const evalDeBTL = document.getElementById('evalDeBTL');
     const evalChamDe = document.getElementById('evalChamDe');
+    const evalDanDe = document.getElementById('evalDanDe');
+    const eval3CangDe = document.getElementById('eval3CangDe');
+    const eval3CangLo = document.getElementById('eval3CangLo');
+    const evalDan3Cang = document.getElementById('evalDan3Cang');
     const aiLessonsList = document.getElementById('aiLessonsList');
     const weightBacNho = document.getElementById('weightBacNho');
     const weightDauCam = document.getElementById('weightDauCam');
@@ -340,25 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Unlock button handler
-    btnUnlockDay.addEventListener('click', () => {
-        const selectedDate = inputDrawDate.value || todayVN;
-        const lockedDays = getLockedDays();
-
-        if (!lockedDays[selectedDate]) {
-            showToast("Kỳ này chưa bị khóa.");
-            return;
-        }
-
-        if (confirm(`Bạn có chắc chắn muốn MỞ KHÓA kỳ quay ngày ${selectedDate} để nhập lại kết quả không?`)) {
-            delete lockedDays[selectedDate];
-            localStorage.setItem('bo_so_locked_days', JSON.stringify(lockedDays));
-            populateQuickHistorySelect();
-            checkDailyLockStatus();
-            showToast(`🔓 Đã mở khóa kỳ ngày ${selectedDate}. Bạn có thể nhập lại!`);
-        }
-    });
-
     // --- CHECK MYSQL STATUS ---
     checkMySQLStatus();
     function checkMySQLStatus() {
@@ -489,22 +480,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            showToast("🌐 Đang kết nối máy chủ cào kết quả XSMB trực tuyến...");
+            showToast("🌐 Đang kết nối máy chủ cào kết quả XSMB trực tuyến...", "info");
 
             try {
-                const res = await fetch(`${API_BASE}/latest-draw`).catch(() => null);
+                // Thử cào qua API Server (Local hoặc Render Cloud)
+                let res = await fetch(`${API_BASE}/latest-draw?date=${selectedDate}`).catch(() => null);
+                
                 if (res && res.ok) {
                     const data = await res.json();
                     if (data && data.raw_prizes) {
                         applyOnlinePrizes(data.raw_prizes, data.lotto_numbers);
                         runPrediction();
-                        showToast(`⚡ Đã tự động cào đủ 27 giải và AI đã chốt số ngày ${selectedDate}!`);
+                        showToast(`✅ Đã tự động cào đủ 27 giải và AI đã chốt số ngày ${selectedDate}!`, "success");
                         return;
                     }
                 }
+
+                // Fallback tầng 2: Kho lưu trữ Master hoặc Lịch sử chuẩn
+                const history = getHistory();
+                const hist = history.find(h => h.date === selectedDate);
+                if (hist && hist.rawPrizes) {
+                    applyOnlinePrizes(hist.rawPrizes, hist.lottoNumbers);
+                    runPrediction();
+                    showToast(`⚡ Đã tải kết quả 27 giải ngày ${selectedDate} và AI đã chốt số!`, "success");
+                    return;
+                }
             } catch (e) {}
 
-            alert("Chưa thể kết nối tới nguồn cào trực tiếp. Vui lòng kiểm tra lại sau hoặc dán kết quả 27 giải vào ô nhập.");
+            showToast("Chưa thể kết nối tới nguồn cào trực tiếp lúc này. Bạn vui lòng thử lại hoặc dán kết quả 27 giải vào ô nhập.", "warning");
         });
     }
 
@@ -524,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quickCountBadge.textContent = `Đã nhận: 0 số`;
         const inputs = fullBoardContainer.querySelectorAll('input');
         inputs.forEach(i => i.value = '');
-        showToast("Đã xóa trắng bảng nhập liệu");
+        showToast("Đã xóa trắng bảng nhập liệu", "info");
     });
 
     // --- MAIN PREDICTION & IDEMPOTENT LOCK HANDLER ---
@@ -536,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lockedDays[selectedDate]) {
             renderLockedPrediction(lockedDays[selectedDate]);
-            showToast(`🔒 Ngày ${selectedDate} đã được chốt số cố định từ trước! Hiển thị lại bản chốt.`);
+            showToast(`🔒 Ngày ${selectedDate} đã được chốt số cố định từ trước! Hiển thị lại bản chốt.`, "info");
             return;
         }
 
@@ -548,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentMode === 'quick') {
             const txt = quickInputText.value.trim();
             if (!txt) {
-                alert("Vui lòng nhập hoặc dán dãy số lô đã về!");
+                showToast("Vui lòng nhập hoặc dán dãy số lô đã về!", "warning");
                 return;
             }
             lottoNumbers = engine.parseQuickInput(txt);
@@ -566,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (lottoNumbers.length === 0) {
-            alert("Không nhận diện được số lô hợp lệ. Vui lòng kiểm tra lại!");
+            showToast("Không nhận diện được số lô hợp lệ. Vui lòng kiểm tra lại!", "error");
             return;
         }
 
@@ -575,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let learningEntry = null;
         const activePastPred = getActivePrediction();
         if (activePastPred) {
-            evalResult = engine.evaluatePastPrediction(lottoNumbers, specialPrize, activePastPred);
+            evalResult = engine.evaluatePastPrediction(lottoNumbers, specialPrize, activePastPred, rawPrizes);
             if (evalResult) {
                 learningEntry = engine.adaptWeightsAndLearn(evalResult);
                 renderEvaluationReport(evalResult, learningEntry);
@@ -620,6 +623,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         saveDrawToLocalStorage(lastInputData, result, result.fullBettingSlip);
 
+        // TỰ ĐỘNG BẮN SỐ QUA TELEGRAM BOT VÀ LƯU LÊN CLOUD MASTER SERVER
+        broadcastSlipToMasterServer(lastInputData, result, result.fullBettingSlip);
+
         renderPredictions(result);
         renderHeadTails(result.inputSummary);
         renderHeatmap(result.scores);
@@ -630,6 +636,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         showToast("🔒 Đã chốt số cố định & ghi vào Sổ Tay Chốt Số Toàn Diện!");
+    }
+
+    async function broadcastSlipToMasterServer(inputData, predictionResult, fullSlip) {
+        const payload = {
+            draw_date: inputData.date,
+            special_prize: inputData.specialPrize,
+            prize_1: inputData.prize1,
+            raw_prizes: inputData.rawPrizes,
+            lotto_numbers: inputData.lottoNumbers,
+            full_betting_slip: fullSlip
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/save-draw`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res && res.ok) {
+                showToast("🤖 Đã tự động bắn Sổ Tay Chốt Số VIP vào nhóm Telegram!", "success");
+            } else {
+                fetch(`${API_BASE}/broadcast-telegram`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slip: fullSlip })
+                });
+            }
+        } catch (e) {
+            console.warn("Không thể kết nối Master Server API:", e);
+        }
     }
 
     // --- RENDER FULL BETTING SLIP ---
@@ -766,38 +803,114 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- RENDER EVALUATION & LEARNING REPORT ---
     function renderEvaluationReport(evalResult, learningEntry) {
-        if (evalResult.btl.success) {
-            evalBTL.innerHTML = `<span class="text-emerald-400 font-bold">[${evalResult.btl.num}] ➜ TRÚNG ${evalResult.btl.hits} NHÁY 🎯</span>`;
-        } else {
-            evalBTL.innerHTML = `<span class="text-gray-400">[${evalResult.btl.num}] ➜ Chưa về</span>`;
+        if (!evalResult) return;
+
+        // Điểm đánh giá tổng hợp
+        if (evalAccuracyBadge) {
+            const score = evalResult.totalScorePoints;
+            if (score >= 80) {
+                evalAccuracyBadge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-black animate-pulse';
+                evalAccuracyBadge.textContent = `${score}đ • ĐẠI THẮNG 🔥`;
+            } else if (score >= 40) {
+                evalAccuracyBadge.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-black';
+                evalAccuracyBadge.textContent = `${score}đ • THẮNG LÔ TÔ ✨`;
+            } else {
+                evalAccuracyBadge.className = 'px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black';
+                evalAccuracyBadge.textContent = `${score}đ • ĐANG HỌC HỎI 🧠`;
+            }
         }
 
-        if (evalResult.stl.count > 0) {
-            evalSTL.innerHTML = `<span class="text-cyan-300 font-bold">[${evalResult.stl.list.join('-')}] ➜ Trúng ${evalResult.stl.hits.join(', ')}</span>`;
-        } else {
-            evalSTL.innerHTML = `<span class="text-gray-400">[${evalResult.stl.list.join('-')}] ➜ Chưa về</span>`;
+        // 1. BAO LÔ & LÔ KÉP
+        const b = evalResult.baoLo || {};
+        if (evalBTL && b.btl) {
+            evalBTL.innerHTML = b.btl.success
+                ? `<span class="text-emerald-400 font-bold">[${b.btl.num}] ➜ TRÚNG ${b.btl.hits} NHÁY 🎯</span>`
+                : `<span class="text-gray-400">[${b.btl.num}] ➜ Chưa về</span>`;
+        }
+        if (evalSTL && b.stl) {
+            evalSTL.innerHTML = b.stl.hits.length > 0
+                ? `<span class="text-cyan-300 font-bold">[${b.stl.list.join('-')}] ➜ Trúng ${b.stl.hits.join(', ')} 💎</span>`
+                : `<span class="text-gray-400">[${b.stl.list.join('-')}] ➜ Chưa về</span>`;
+        }
+        if (evalDanLotto && b.dan4) {
+            evalDanLotto.innerHTML = b.dan4.hits.length > 0
+                ? `<span class="text-amber-300 font-bold">Ăn ${b.dan4.hits.length}/4 con (${b.dan4.hits.join(', ')})</span>`
+                : `<span class="text-gray-400">Ăn 0/4 con</span>`;
+        }
+        if (evalKep && b.topKep) {
+            evalKep.innerHTML = b.topKep.hits.length > 0
+                ? `<span class="text-emerald-300 font-bold">Nổ Kép: ${b.topKep.hits.join(', ')} ⚡</span>`
+                : `<span class="text-gray-400">[${b.topKep.list.join(', ')}] ➜ Chưa về</span>`;
         }
 
-        if (evalResult.dan4.count > 0) {
-            evalDan4.innerHTML = `<span class="text-yellow-300 font-bold">Trúng ${evalResult.dan4.count}/4 con (${evalResult.dan4.hits.join(', ')})</span>`;
-        } else {
-            evalDan4.innerHTML = `<span class="text-gray-400">Trúng 0/4 con</span>`;
+        // 2. XIÊN & XIÊN QUAY
+        const x = evalResult.loXien || {};
+        if (evalXien2 && x.xien2) {
+            evalXien2.innerHTML = x.xien2.won.length > 0
+                ? `<span class="text-cyan-300 font-bold">Ăn ${x.xien2.won.length} cặp (${x.xien2.won.map(p => p.join('-')).join(', ')}) 🔥</span>`
+                : `<span class="text-gray-400">Chưa ăn cặp xiên</span>`;
+        }
+        if (evalXienQuay && x.xienQuay4) {
+            evalXienQuay.innerHTML = x.xienQuay4.hits.length >= 2
+                ? `<span class="text-emerald-300 font-bold">Xiên Quay về ${x.xienQuay4.hits.length}/4 con (${x.xienQuay4.hits.join(', ')}) 🎯</span>`
+                : `<span class="text-gray-400">Về ${x.xienQuay4.hits.length}/4 con</span>`;
         }
 
-        if (evalResult.chamDe.success) {
-            evalChamDe.innerHTML = `<span class="text-pink-300 font-bold">Trúng Chạm [${evalResult.chamDe.list.join(',')}] (ĐB: ${evalResult.chamDe.actualGDB}) 👑</span>`;
-        } else {
-            evalChamDe.innerHTML = `<span class="text-gray-400">Lệch Chạm (ĐB: ${evalResult.chamDe.actualGDB})</span>`;
+        // 3. ĐẶC BIỆT & DÀN ĐỀ
+        const d = evalResult.dacBiet || {};
+        if (evalDeBTL && d.deBTL) {
+            evalDeBTL.innerHTML = d.deBTL.success
+                ? `<span class="text-pink-400 font-black">TRÚNG ĐỀ BTL ${d.deBTL.num} (ĐB: ${evalResult.actualGDB}) 👑</span>`
+                : `<span class="text-gray-400">[${d.deBTL.num}] ➜ ĐB về ${evalResult.actualGDB}</span>`;
+        }
+        if (evalChamDe && d.chamDe) {
+            evalChamDe.innerHTML = d.chamDe.success
+                ? `<span class="text-pink-300 font-bold">Trúng Chạm [${d.chamDe.hitChams.join(',')}] (ĐB: ${evalResult.actualGDB}) 👑</span>`
+                : `<span class="text-gray-400">Lệch Chạm (ĐB: ${evalResult.actualGDB})</span>`;
+        }
+        if (evalDanDe && d.danDe10) {
+            if (d.danDe10.success) {
+                evalDanDe.innerHTML = `<span class="text-emerald-400 font-bold">Ăn Đề trong Dàn 10 Số 💎</span>`;
+            } else if (d.danDe20.success) {
+                evalDanDe.innerHTML = `<span class="text-cyan-300 font-bold">Ăn Đề trong Dàn 20 Số ✨</span>`;
+            } else if (d.danDe36.success) {
+                evalDanDe.innerHTML = `<span class="text-amber-300 font-bold">Ăn Đề trong Dàn 36 Số ✨</span>`;
+            } else if (d.danDe64.success) {
+                evalDanDe.innerHTML = `<span class="text-purple-300 font-bold">Ăn Đề trong Dàn 64 Số</span>`;
+            } else {
+                evalDanDe.innerHTML = `<span class="text-gray-400">Chưa nổ trong dàn</span>`;
+            }
         }
 
-        aiLessonsList.innerHTML = '';
-        if (learningEntry && learningEntry.lessons) {
-            learningEntry.lessons.forEach(l => {
-                const item = document.createElement('div');
-                item.className = 'text-gray-200 flex items-start space-x-1.5';
-                item.innerHTML = `<span class="text-amber-400">✔</span><span>${l}</span>`;
-                aiLessonsList.appendChild(item);
-            });
+        // 4. BA CÀNG
+        const c = evalResult.baCang || {};
+        if (eval3CangDe && c.deVIP) {
+            eval3CangDe.innerHTML = c.deVIP.success
+                ? `<span class="text-purple-300 font-black">TRÚNG 3 CÀNG ĐỀ (${evalResult.actual3CangDe}) 🔮</span>`
+                : `<span class="text-gray-400">3 Càng ĐB về ${evalResult.actual3CangDe || '--'}</span>`;
+        }
+        if (eval3CangLo && c.loVIP) {
+            eval3CangLo.innerHTML = c.loVIP.hits.length > 0
+                ? `<span class="text-purple-300 font-bold">Trúng 3 Càng Lô: ${c.loVIP.hits.join(', ')} 🔥</span>`
+                : `<span class="text-gray-400">[${c.loVIP.list.join(', ')}] ➜ Chưa về</span>`;
+        }
+        if (evalDan3Cang && c.danBaCang) {
+            evalDan3Cang.innerHTML = c.danBaCang.count > 0
+                ? `<span class="text-purple-300 font-bold">Trúng ${c.danBaCang.count} con (${c.danBaCang.hits.join(', ')})</span>`
+                : `<span class="text-gray-400">Chưa nổ dàn 3 càng</span>`;
+        }
+
+        // Danh sách bài học AI
+        if (aiLessonsList) {
+            aiLessonsList.innerHTML = '';
+            if (learningEntry && learningEntry.lessons) {
+                learningEntry.lessons.forEach(l => {
+                    const item = document.createElement('div');
+                    item.className = 'text-gray-200 flex items-start space-x-1.5 text-xs';
+                    item.innerHTML = `<span class="text-amber-400 font-bold">✔</span><span>${l}</span>`;
+                    aiLessonsList.appendChild(item);
+                });
+            }
         }
     }
 
@@ -809,17 +922,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lastLocked && lastLocked.fullBettingSlip) {
             const slip = lastLocked.fullBettingSlip;
-            evalBTL.innerHTML = `<span class="text-amber-300 font-bold font-mono text-sm">${slip.baoLo.btl} (Ngày ${lastLockedDate})</span>`;
-            evalSTL.innerHTML = `<span class="text-cyan-300 font-mono text-sm">${slip.baoLo.stl.join(' - ')}</span>`;
-            evalDan4.innerHTML = `<span class="text-yellow-300 font-mono text-xs">${slip.baoLo.dan4.join(' - ')}</span>`;
-            evalChamDe.innerHTML = `<span class="text-pink-300 font-mono text-xs">Chạm [${slip.dacBiet.chamDe.join(',')}]</span>`;
-            aiLessonsList.innerHTML = `<div>⚡ Bản chốt số ngày <strong>${lastLockedDate}</strong> đã được nạp làm mốc đối chiếu. Khi bạn nạp kết quả kỳ mới, hệ thống sẽ tự động so khớp và rút kinh nghiệm!</div>`;
-        } else {
-            evalBTL.innerHTML = `<span class="text-amber-400">Đã lưu kỳ này làm mốc</span>`;
-            evalSTL.innerHTML = `<span>Sẽ đối chiếu khi có kết quả mới</span>`;
-            evalDan4.innerHTML = `<span>Sẵn sàng ghi nhận</span>`;
-            evalChamDe.innerHTML = `<span>Sẵn sàng ghi nhận</span>`;
-            aiLessonsList.innerHTML = `<div>⚡ Dữ liệu kỳ gần nhất đã sẵn sàng. Khi bạn nạp kết quả kỳ mới, hệ thống sẽ tự động so khớp và hiệu chỉnh trọng số AI!</div>`;
+            if (evalAccuracyBadge) evalAccuracyBadge.textContent = `MỐC: NGÀY ${lastLockedDate}`;
+            if (evalBTL && slip.baoLo) evalBTL.innerHTML = `<span class="text-amber-300 font-bold font-mono text-xs">${slip.baoLo.btl} (Đã chốt)</span>`;
+            if (evalSTL && slip.baoLo) evalSTL.innerHTML = `<span class="text-cyan-300 font-mono text-xs">${slip.baoLo.stl.join(' - ')}</span>`;
+            if (evalDanLotto && slip.baoLo) evalDanLotto.innerHTML = `<span class="text-yellow-300 font-mono text-xs">${slip.baoLo.dan4.join(' - ')}</span>`;
+            if (evalKep && slip.baoLo) evalKep.innerHTML = `<span class="text-gray-300 font-mono text-xs">${slip.baoLo.topKep.join(', ')}</span>`;
+            if (evalXien2 && slip.loXien) evalXien2.innerHTML = `<span class="text-cyan-300 font-mono text-xs">${slip.loXien.xien2.map(i => i.join('-')).join(', ')}</span>`;
+            if (evalXienQuay && slip.loXien) evalXienQuay.innerHTML = `<span class="text-gray-300 font-mono text-xs">[${slip.loXien.xienQuay4.join(',')}]</span>`;
+            if (evalDeBTL && slip.dacBiet) evalDeBTL.innerHTML = `<span class="text-pink-300 font-mono text-xs">${slip.dacBiet.deBTL}</span>`;
+            if (evalChamDe && slip.dacBiet) evalChamDe.innerHTML = `<span class="text-pink-300 font-mono text-xs">Chạm [${slip.dacBiet.chamDe.join(',')}]</span>`;
+            if (evalDanDe) evalDanDe.innerHTML = `<span class="text-gray-300 font-mono text-xs">Dàn 10, 20, 36, 64 số</span>`;
+            if (eval3CangDe && slip.baCang) eval3CangDe.innerHTML = `<span class="text-purple-300 font-mono text-xs">${slip.baCang.baCangDeVIP.slice(0, 3).join(', ')}</span>`;
+            if (eval3CangLo && slip.baCang) eval3CangLo.innerHTML = `<span class="text-purple-300 font-mono text-xs">${slip.baCang.baCangLoVIP.join(' - ')}</span>`;
+            if (evalDan3Cang) evalDan3Cang.innerHTML = `<span class="text-gray-300 font-mono text-xs">Dàn 3 Càng ghép</span>`;
+            if (aiLessonsList) aiLessonsList.innerHTML = `<div>⚡ Bản chốt số ngày <strong>${lastLockedDate}</strong> đã được nạp làm mốc đối chiếu. Khi bạn nạp kết quả kỳ mới, hệ thống sẽ tự động so khớp tất cả 4 hạng mục Lô, Xiên, Đề, 3 Càng và rút bài học kinh nghiệm!</div>`;
         }
     }
 
@@ -1032,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             runPrediction();
         }
         if (!lastInputData) {
-            alert("Vui lòng nhập kết quả xổ số trước khi lưu!");
+            showToast("Vui lòng nhập kết quả xổ số trước khi lưu!", "warning");
             return;
         }
 
@@ -1195,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetsRaw = ruleTargetNums.value.trim();
 
             if (!src || !targetsRaw) {
-                alert("Vui lòng điền đầy đủ số nguồn và các số báo!");
+                showToast("Vui lòng điền đầy đủ số nguồn và các số báo!", "warning");
                 return;
             }
 
@@ -1203,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formattedTargets = targetsRaw.split(/[^0-9]+/).filter(t => t.length > 0).map(t => engine.formatNum(t));
 
             if (formattedTargets.length === 0) {
-                alert("Vui lòng nhập ít nhất một số báo hợp lệ!");
+                showToast("Vui lòng nhập ít nhất một số báo hợp lệ!", "warning");
                 return;
             }
 
@@ -1219,11 +1335,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnResetRules) {
         btnResetRules.addEventListener('click', () => {
-            if (confirm("Bạn có chắc chắn muốn khôi phục toàn bộ quy tắc bạc nhớ về mặc định không?")) {
+            showCyberConfirm("Bạn có chắc chắn muốn khôi phục toàn bộ quy tắc bạc nhớ về mặc định không?", () => {
                 customRules = JSON.parse(JSON.stringify(DEFAULT_RULES));
                 saveRulesToStorage(customRules);
-                showToast("Đã khôi phục quy tắc gốc thành công!");
-            }
+                showToast("Đã khôi phục quy tắc gốc thành công!", "success");
+            });
         });
     }
 
@@ -1389,24 +1505,105 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClearHistory = document.getElementById('btnClearHistory');
     if (btnClearHistory) {
         btnClearHistory.addEventListener('click', () => {
-            if (confirm("Bạn có chắc muốn xóa sạch toàn bộ lịch sử không?")) {
+            showCyberConfirm("Bạn có chắc chắn muốn xóa sạch toàn bộ lịch sử không? Hành động này không thể hoàn tác.", () => {
                 localStorage.removeItem('bo_so_history');
                 localStorage.removeItem('bo_so_locked_days');
                 populateQuickHistorySelect();
                 renderHistoryList();
                 checkDailyLockStatus();
-                showToast("Đã xóa toàn bộ lịch sử!");
-            }
+                showToast("Đã xóa toàn bộ lịch sử!", "info");
+            });
         });
     }
 
-    function showToast(msg) {
-        const toast = document.createElement('div');
-        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs shadow-2xl animate-fade-in flex items-center space-x-2';
-        toast.innerHTML = `<span>⚡</span><span>${msg}</span>`;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
+    // --- CYBER CONFIRM MODAL DIALOG ---
+    function showCyberConfirm(message, onConfirm) {
+        const modal = document.getElementById('cyberConfirmModal');
+        const msgEl = document.getElementById('cyberConfirmMessage');
+        const btnOk = document.getElementById('btnCyberConfirmOk');
+        const btnCancel = document.getElementById('btnCyberConfirmCancel');
+        
+        if (!modal || !msgEl || !btnOk || !btnCancel) {
+            if (window.confirm(message)) onConfirm();
+            return;
+        }
+
+        msgEl.textContent = message;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        function cleanup() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            btnOk.removeEventListener('click', handleOk);
+            btnCancel.removeEventListener('click', handleCancel);
+        }
+
+        function handleOk() {
+            cleanup();
+            if (typeof onConfirm === 'function') onConfirm();
+        }
+
+        function handleCancel() {
+            cleanup();
+        }
+
+        btnOk.addEventListener('click', handleOk);
+        btnCancel.addEventListener('click', handleCancel);
     }
+
+    // --- UNIFIED CYBER TOAST NOTIFICATION SYSTEM ---
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        
+        let iconHtml = '⚡';
+        let typeClass = 'toast-info';
+        let iconBg = 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300';
+
+        if (type === 'warning') {
+            iconHtml = '⚠️';
+            typeClass = 'toast-warning';
+            iconBg = 'bg-amber-500/20 border-amber-500/40 text-amber-300';
+        } else if (type === 'error') {
+            iconHtml = '❌';
+            typeClass = 'toast-error';
+            iconBg = 'bg-rose-500/20 border-rose-500/40 text-rose-400';
+        } else if (type === 'success') {
+            iconHtml = '✅';
+            typeClass = 'toast-success';
+            iconBg = 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400';
+        }
+
+        toast.className = `cyber-toast ${typeClass}`;
+        toast.innerHTML = `
+            <div class="w-8 h-8 rounded-xl border flex items-center justify-center text-sm shrink-0 shadow-inner ${iconBg}">
+                ${iconHtml}
+            </div>
+            <div class="flex-1 text-xs text-gray-100 font-bold leading-snug">
+                ${msg}
+            </div>
+        `;
+        
+        if (container) {
+            container.appendChild(toast);
+        } else {
+            document.body.appendChild(toast);
+        }
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 15);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3200);
+    }
+
+    // Ghi đè alert mặc định của trình duyệt để 100% popup đều dùng Cyber Toast hiện đại
+    window.alert = function(msg) {
+        showToast(msg, 'warning');
+    };
 });

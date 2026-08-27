@@ -36,10 +36,11 @@ def format_telegram_slip_message(slip_data):
     de_btl = dac_biet.get("deBTL", "--")
     cham_de = ", ".join(dac_biet.get("chamDe", ["--"]))
     dan_de_10 = ", ".join(dac_biet.get("danDe10", ["--"]))
-    dan_de_36 = ", ".join(dac_biet.get("danDe36", ["--"])[:12]) + "..."
+    dan_de_20 = ", ".join(dac_biet.get("danDe20", ["--"]))
+    dan_de_36 = ", ".join(dac_biet.get("danDe36", ["--"]))
 
     cang_vip = " - ".join(ba_cang.get("baCangLoVIP", ["--"]))
-    dan_3_cang = ", ".join(ba_cang.get("danBaCang", ["--"])[:6])
+    dan_3_cang = ", ".join(ba_cang.get("danBaCang", ["--"]))
 
     msg = f"""👑 <b>BỘ SỐ HUYỀN THOẠI - SỔ TAY CHỐT SỐ NGÀY {draw_date}</b> 👑
 <i>(Hệ thống AI Tự Học Tăng Cường • Đã Niêm Phong Cố Định)</i>
@@ -59,6 +60,7 @@ def format_telegram_slip_message(slip_data):
 • <b>Đề Bạch Thủ VIP:</b> <code>{de_btl}</code> 💎
 • <b>Chạm Đề Chuẩn:</b> <code>Chạm [{cham_de}]</code>
 • <b>Dàn Đề 10 Số Bất Bại:</b> <code>{dan_de_10}</code>
+• <b>Dàn Đề 20 Số VIP:</b> <code>{dan_de_20}</code>
 • <b>Dàn Đề 36 Số:</b> <code>{dan_de_36}</code>
 
 🔮 <b>4. BA CÀNG ĐỈNH CAO:</b>

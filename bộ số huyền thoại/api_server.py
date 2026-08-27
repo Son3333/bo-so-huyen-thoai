@@ -72,6 +72,88 @@ def save_master_canonical_storage(data):
     except Exception as e:
         print(f"Lỗi ghi Master storage: {e}")
 
+def fetch_live_xsmb_prizes(date_str=None):
+    """
+    Cào kết quả 27 giải XSMB từ nguồn dữ liệu trực tiếp thực tế
+    """
+    import urllib.request
+    import re
+
+    # 1. Quét trực tiếp từ xsmb.me
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+
+    try:
+        req = urllib.request.Request("https://xsmb.me", headers=headers)
+        with urllib.request.urlopen(req, timeout=6) as response:
+            if response.status == 200:
+                html = response.read().decode('utf-8', errors='ignore')
+                
+                def extract_span(pattern):
+                    m = re.search(pattern, html)
+                    return m.group(1).strip() if m else ""
+
+                gdb = extract_span(r'class="v-gdb\s*">([^<]+)<')
+                if gdb and len(gdb) >= 5:
+                    prizes = {
+                        "gdb": gdb,
+                        "g1": extract_span(r'class="v-g1\s*">([^<]+)<'),
+                        "g2_1": extract_span(r'class="v-g2-0\s*">([^<]+)<'),
+                        "g2_2": extract_span(r'class="v-g2-1\s*">([^<]+)<'),
+                        "g3_1": extract_span(r'class="v-g3-0\s*">([^<]+)<'),
+                        "g3_2": extract_span(r'class="v-g3-1\s*">([^<]+)<'),
+                        "g3_3": extract_span(r'class="v-g3-2\s*">([^<]+)<'),
+                        "g3_4": extract_span(r'class="v-g3-3\s*">([^<]+)<'),
+                        "g3_5": extract_span(r'class="v-g3-4\s*">([^<]+)<'),
+                        "g3_6": extract_span(r'class="v-g3-5\s*">([^<]+)<'),
+                        "g4_1": extract_span(r'class="v-g4-0\s*">([^<]+)<'),
+                        "g4_2": extract_span(r'class="v-g4-1\s*">([^<]+)<'),
+                        "g4_3": extract_span(r'class="v-g4-2\s*">([^<]+)<'),
+                        "g4_4": extract_span(r'class="v-g4-3\s*">([^<]+)<'),
+                        "g5_1": extract_span(r'class="v-g5-0\s*">([^<]+)<'),
+                        "g5_2": extract_span(r'class="v-g5-1\s*">([^<]+)<'),
+                        "g5_3": extract_span(r'class="v-g5-2\s*">([^<]+)<'),
+                        "g5_4": extract_span(r'class="v-g5-3\s*">([^<]+)<'),
+                        "g5_5": extract_span(r'class="v-g5-4\s*">([^<]+)<'),
+                        "g5_6": extract_span(r'class="v-g5-5\s*">([^<]+)<'),
+                        "g6_1": extract_span(r'class="v-g6-0\s*">([^<]+)<'),
+                        "g6_2": extract_span(r'class="v-g6-1\s*">([^<]+)<'),
+                        "g6_3": extract_span(r'class="v-g6-2\s*">([^<]+)<'),
+                        "g7_1": extract_span(r'class="v-g7-0\s*">([^<]+)<'),
+                        "g7_2": extract_span(r'class="v-g7-1\s*">([^<]+)<'),
+                        "g7_3": extract_span(r'class="v-g7-2\s*">([^<]+)<'),
+                        "g7_4": extract_span(r'class="v-g7-3\s*">([^<]+)<')
+                    }
+
+                    ordered_keys = ['gdb', 'g1', 'g2_1', 'g2_2', 'g3_1', 'g3_2', 'g3_3', 'g3_4', 'g3_5', 'g3_6',
+                                    'g4_1', 'g4_2', 'g4_3', 'g4_4', 'g5_1', 'g5_2', 'g5_3', 'g5_4', 'g5_5', 'g5_6',
+                                    'g6_1', 'g6_2', 'g6_3', 'g7_1', 'g7_2', 'g7_3', 'g7_4']
+                    lotto_numbers = [prizes[k][-2:] for k in ordered_keys if len(prizes.get(k, '')) >= 2]
+                    
+                    if len(lotto_numbers) >= 27:
+                        return {
+                            "status": "success",
+                            "source": "live_xsmb_me",
+                            "draw_date": date_str or datetime.datetime.now().strftime('%Y-%m-%d'),
+                            "raw_prizes": prizes,
+                            "lotto_numbers": lotto_numbers
+                        }
+    except Exception as e:
+        print(f"Lỗi cào xsmb.me: {e}")
+
+    # Fallback to storage
+    storage = load_master_canonical_storage()
+    locked_days = storage.get("locked_days", {})
+    if date_str and date_str in locked_days:
+        day_data = locked_days[date_str]
+        raw = day_data.get("rawPrizes") or day_data.get("raw_prizes") or (day_data.get("inputData", {}).get("rawPrizes"))
+        lotto = day_data.get("lottoNumbers") or day_data.get("lotto_numbers") or (day_data.get("inputData", {}).get("lottoNumbers"))
+        if raw and lotto:
+            return {"status": "success", "source": "master_storage", "draw_date": date_str, "raw_prizes": raw, "lotto_numbers": lotto}
+
+    return None
+
 class MasterAPIRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -124,6 +206,25 @@ class MasterAPIRequestHandler(http.server.SimpleHTTPRequestHandler):
                 'status': 'success',
                 'data': res_data
             }, ensure_ascii=False).encode('utf-8'))
+            return
+
+        elif path == '/api/latest-draw':
+            date_param = query.get('date', [None])[0]
+            live_data = fetch_live_xsmb_prizes(date_param)
+            
+            if live_data:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.end_headers()
+                self.wfile.write(json.dumps(live_data, ensure_ascii=False).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    'status': 'error',
+                    'message': 'Chưa có kết quả hoặc máy chủ đang quét'
+                }, ensure_ascii=False).encode('utf-8'))
             return
 
         elif path == '/api/history':

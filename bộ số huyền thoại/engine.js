@@ -183,31 +183,97 @@ class PredictionEngine {
     // 🧠 TỰ ĐỘNG ĐỐI CHIẾU & HỌC TĂNG CƯỜNG (REINFORCEMENT LEARNING)
     // =========================================================================
 
-    evaluatePastPrediction(actualLottoNumbers, actualSpecialPrize, pastPrediction) {
-        if (!pastPrediction || !pastPrediction.recommendations) return null;
+    evaluatePastPrediction(actualLottoNumbers, actualSpecialPrize, pastPrediction, rawPrizes = {}) {
+        if (!pastPrediction) return null;
+
+        const slip = pastPrediction.fullBettingSlip || {};
+        const rec = pastPrediction.recommendations || {};
+        const baoLo = slip.baoLo || rec || {};
+        const loXien = slip.loXien || rec || {};
+        const dacBiet = slip.dacBiet || rec || {};
+        const baCang = slip.baCang || rec || {};
 
         const actualFormatted = actualLottoNumbers.map(n => this.formatNum(n));
-        const rec = pastPrediction.recommendations;
         const actualGDB = actualSpecialPrize.length >= 2 ? actualSpecialPrize.slice(-2) : (actualFormatted[0] || '');
+        const actual3CangDe = actualSpecialPrize.length >= 3 ? actualSpecialPrize.slice(-3) : '';
 
-        // 1. Kiểm tra Bạch Thủ Lô
-        const btl = rec.bachThu;
+        // Trích xuất tất cả 3 càng lô thực tế về trong ngày
+        const actual3CangLoList = [];
+        if (rawPrizes) {
+            Object.keys(rawPrizes).forEach(k => {
+                const val = String(rawPrizes[k]).trim();
+                if (val.length >= 3) {
+                    actual3CangLoList.push(val.slice(-3));
+                }
+            });
+        }
+
+        // 1. ĐỐI SOÁT BAO LÔ & LÔ KÉP
+        const btl = baoLo.btl || rec.bachThu || '--';
         const btlHits = actualFormatted.filter(n => n === btl).length;
         const btlSuccess = btlHits > 0;
 
-        // 2. Kiểm tra Song Thủ Lô
-        const stl = rec.songThu || [];
+        const stl = baoLo.stl || rec.songThu || [];
         const stlHits = stl.filter(n => actualFormatted.includes(n));
+        const stlMissed = stl.filter(n => !actualFormatted.includes(n));
 
-        // 3. Kiểm tra Dàn 4 & Dàn 8
-        const dan4Hits = (rec.dan4 || []).filter(n => actualFormatted.includes(n));
-        const dan8Hits = (rec.dan8 || []).filter(n => actualFormatted.includes(n));
+        const topKep = baoLo.topKep || rec.topKep || [];
+        const kepHits = topKep.filter(n => actualFormatted.includes(n));
+        const kepMissed = topKep.filter(n => !actualFormatted.includes(n));
 
-        // 4. Kiểm tra Chạm Đề
-        const chamDeHits = (rec.chamDe || []).filter(c => actualGDB.includes(c));
-        const chamDeSuccess = chamDeHits.length > 0;
+        const dan4 = baoLo.dan4 || rec.dan4 || [];
+        const dan4Hits = dan4.filter(n => actualFormatted.includes(n));
+        const dan4Missed = dan4.filter(n => !actualFormatted.includes(n));
 
-        // 5. Thống kê lý do
+        const dan8 = baoLo.dan8 || rec.dan8 || [];
+        const dan8Hits = dan8.filter(n => actualFormatted.includes(n));
+
+        const dan10 = baoLo.dan10 || rec.dan10 || [];
+        const dan10Hits = dan10.filter(n => actualFormatted.includes(n));
+
+        // 2. ĐỐI SOÁT LÔ XIÊN & XIÊN QUAY
+        const xien2 = loXien.xien2 || rec.xien2 || [];
+        const xien2Won = xien2.filter(pair => pair.every(n => actualFormatted.includes(n)));
+        const xien2Missed = xien2.filter(pair => !pair.every(n => actualFormatted.includes(n)));
+
+        const xq4 = loXien.xienQuay4 || dan4.slice(0, 4);
+        const xq4Hits = xq4.filter(n => actualFormatted.includes(n));
+
+        // 3. ĐỐI SOÁT GIẢI ĐẶC BIỆT & DÀN ĐỀ
+        const deBTL = dacBiet.deBTL || '--';
+        const deBTLSuccess = (deBTL === actualGDB);
+
+        const deSTL = dacBiet.deSTL || [];
+        const deSTLSuccess = deSTL.includes(actualGDB);
+
+        const chamDe = dacBiet.chamDe || rec.chamDe || [];
+        const hitChams = chamDe.filter(c => actualGDB.includes(c));
+        const chamDeSuccess = hitChams.length > 0;
+
+        const danDe10 = dacBiet.danDe10 || [];
+        const danDe10Success = danDe10.includes(actualGDB);
+
+        const danDe20 = dacBiet.danDe20 || [];
+        const danDe20Success = danDe20.includes(actualGDB);
+
+        const danDe36 = dacBiet.danDe36 || [];
+        const danDe36Success = danDe36.includes(actualGDB);
+
+        const danDe64 = dacBiet.danDe64 || [];
+        const danDe64Success = danDe64.includes(actualGDB);
+
+        // 4. ĐỐI SOÁT BA CÀNG
+        const baCangDeVIP = baCang.baCangDeVIP || [];
+        const baCangDeSuccess = actual3CangDe && baCangDeVIP.includes(actual3CangDe);
+
+        const baCangLoVIP = baCang.baCangLoVIP || [];
+        const baCangLoHits = baCangLoVIP.filter(c => actual3CangLoList.includes(c));
+        const baCangLoMissed = baCangLoVIP.filter(c => !actual3CangLoList.includes(c));
+
+        const danBaCang = baCang.danBaCang || [];
+        const danBaCangHits = danBaCang.filter(c => actual3CangLoList.includes(c) || c === actual3CangDe);
+
+        // 5. THỐNG KÊ LÝ DO & TÍNH ĐIỂM
         const winningReasons = [];
         const pastReasons = pastPrediction.reasons || {};
 
@@ -220,18 +286,44 @@ class PredictionEngine {
         });
 
         let totalScorePoints = 0;
-        if (btlSuccess) totalScorePoints += 40 * btlHits;
-        totalScorePoints += (stlHits.length / (stl.length || 1)) * 25;
+        if (btlSuccess) totalScorePoints += 35 * Math.min(2, btlHits);
+        totalScorePoints += (stlHits.length / Math.max(1, stl.length)) * 25;
         totalScorePoints += (dan4Hits.length / 4) * 20;
-        totalScorePoints += (dan8Hits.length / 8) * 15;
+        if (chamDeSuccess) totalScorePoints += 15;
+        if (danDe36Success) totalScorePoints += 10;
+        if (baCangLoHits.length > 0 || baCangDeSuccess) totalScorePoints += 15;
 
         return {
             drawDate: pastPrediction.date || 'Hôm qua',
-            btl: { num: btl, success: btlSuccess, hits: btlHits },
-            stl: { list: stl, hits: stlHits, count: stlHits.length },
-            dan4: { list: rec.dan4, hits: dan4Hits, count: dan4Hits.length },
-            dan8: { list: rec.dan8, hits: dan8Hits, count: dan8Hits.length },
-            chamDe: { list: rec.chamDe, success: chamDeSuccess, actualGDB },
+            actualGDB,
+            actual3CangDe,
+            actual3CangLoCount: actual3CangLoList.length,
+            baoLo: {
+                btl: { num: btl, success: btlSuccess, hits: btlHits },
+                stl: { list: stl, hits: stlHits, missed: stlMissed, count: stlHits.length },
+                topKep: { list: topKep, hits: kepHits, missed: kepMissed },
+                dan4: { list: dan4, hits: dan4Hits, missed: dan4Missed, count: dan4Hits.length },
+                dan8: { list: dan8, hits: dan8Hits, count: dan8Hits.length },
+                dan10: { list: dan10, hits: dan10Hits, count: dan10Hits.length }
+            },
+            loXien: {
+                xien2: { list: xien2, won: xien2Won, missed: xien2Missed, count: xien2Won.length },
+                xienQuay4: { list: xq4, hits: xq4Hits, count: xq4Hits.length }
+            },
+            dacBiet: {
+                deBTL: { num: deBTL, success: deBTLSuccess },
+                deSTL: { list: deSTL, success: deSTLSuccess },
+                chamDe: { list: chamDe, hitChams, success: chamDeSuccess },
+                danDe10: { success: danDe10Success },
+                danDe20: { success: danDe20Success },
+                danDe36: { success: danDe36Success },
+                danDe64: { success: danDe64Success }
+            },
+            baCang: {
+                deVIP: { list: baCangDeVIP, success: baCangDeSuccess, actual: actual3CangDe },
+                loVIP: { list: baCangLoVIP, hits: baCangLoHits, missed: baCangLoMissed },
+                danBaCang: { list: danBaCang, hits: danBaCangHits, count: danBaCangHits.length }
+            },
             totalScorePoints: Math.min(100, Math.round(totalScorePoints)),
             winningReasons
         };
@@ -249,41 +341,44 @@ class PredictionEngine {
             triggerCounts[type] = (triggerCounts[type] || 0) + 1;
         });
 
+        // 1. Phân tích Bạch Thủ Lô & Song Thủ Lô
+        if (evalResult.baoLo.btl.success) {
+            lessons.push(`🔥 Bạch Thủ Lô ${evalResult.baoLo.btl.num} nổ ${evalResult.baoLo.btl.hits} nháy ➜ Tối ưu hóa trọng số Bạc Nhớ Ma Trận.`);
+        }
+        if (evalResult.baoLo.stl.hits.length > 0) {
+            lessons.push(`💎 Song Thủ Lô nổ ${evalResult.baoLo.stl.hits.join(', ')} ➜ Cặp số tương hỗ tương sinh hoạt động chuẩn xác.`);
+        }
+        if (evalResult.baoLo.dan4.hits.length > 0) {
+            lessons.push(`🎯 Dàn Lô 4 số nổ ${evalResult.baoLo.dan4.hits.length}/4 con (${evalResult.baoLo.dan4.hits.join(', ')}) ➜ Duy trì độ rộng biên độ cầu.`);
+        }
+
+        // 2. Phân tích Chạm Đề & Dàn Đề
+        if (evalResult.dacBiet.chamDe.success) {
+            lessons.push(`👑 Trúng Chạm Đề [${evalResult.dacBiet.chamDe.hitChams.join(',')}] (GĐB về ${evalResult.actualGDB}) ➜ Tăng trọng số phân tích Cầu Đề.`);
+        } else {
+            lessons.push(`🔄 Lệch Chạm Đề (GĐB về ${evalResult.actualGDB}) ➜ AI tự động chuyển dịch trục đối xứng sang bóng âm dương mới.`);
+        }
+
+        // 3. Phân tích Ba Càng
+        if (evalResult.baCang.loVIP.hits.length > 0) {
+            lessons.push(`🔮 3 Càng Lô trúng ${evalResult.baCang.loVIP.hits.join(', ')} ➜ Cầu càng ghép đầu/đuôi đang có phong độ cao.`);
+        }
+
+        // 4. Hiệu chỉnh trọng số số học
         if (triggerCounts['bac_nho']) {
             w.bac_nho = Math.min(50, w.bac_nho + triggerCounts['bac_nho'] * 2);
-            lessons.push(`⚡ Bạc nhớ ma trận đoán trúng ${triggerCounts['bac_nho']} lần ➜ Tăng trọng số lên ${w.bac_nho}đ`);
         } else {
             w.bac_nho = Math.max(15, w.bac_nho - 1);
         }
 
         if (triggerCounts['dau_cam'] || triggerCounts['dau_cam_kep']) {
             w.dau_cam = Math.min(50, w.dau_cam + 4);
-            lessons.push(`🛑 Bạc nhớ Đầu câm báo chuẩn xác ➜ Tăng trọng số lên ${w.dau_cam}đ`);
-        } else {
-            w.dau_cam = Math.max(18, w.dau_cam - 1);
         }
-
         if (triggerCounts['duoi_cam'] || triggerCounts['duoi_cam_kep']) {
             w.duoi_cam = Math.min(50, w.duoi_cam + 4);
-            lessons.push(`⛔ Bạc nhớ Đuôi câm báo chuẩn xác ➜ Tăng trọng số lên ${w.duoi_cam}đ`);
-        } else {
-            w.duoi_cam = Math.max(18, w.duoi_cam - 1);
         }
-
         if (triggerCounts['bong_so']) {
             w.bong_so = Math.min(45, w.bong_so + 3);
-            lessons.push(`✨ Cầu bóng âm dương GĐB nổ ➜ Tăng trọng số lên ${w.bong_so}đ`);
-        } else {
-            w.bong_so = Math.max(12, w.bong_so - 1);
-        }
-
-        if (triggerCounts['lo_roi']) {
-            w.lo_roi = Math.min(35, w.lo_roi + 3);
-            lessons.push(`🔥 Tín hiệu lô rơi nhiều nháy chính xác ➜ Tăng trọng số lên ${w.lo_roi}đ`);
-        }
-
-        if (lessons.length === 0) {
-            lessons.push(`🔄 Đã cân bằng lại trọng số ma trận để tìm kiếm các nhịp cầu mới cho ngày mai.`);
         }
 
         this.saveAdaptiveWeights();
