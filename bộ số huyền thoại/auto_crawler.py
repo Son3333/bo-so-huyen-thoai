@@ -33,31 +33,63 @@ class XSMBCrawler:
 
     def fetch_live_prizes(self):
         """
-        Cào dữ liệu 27 giải từ các nguồn API / Web với cơ chế tự động chuyển nguồn dự phòng
+        Cào dữ liệu 27 giải từ xsmb.me trực tiếp
         """
-        # Thử nghiệm lấy từ nguồn API trực tiếp
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/json, text/html, */*'
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         }
 
         today_str = self.get_vietnam_time().strftime('%Y-%m-%d')
         print(f"[{datetime.now().strftime('%H:%M:%S')}] 🔍 Đang quét kết quả XSMB ngày {today_str}...")
 
-        # Giả lập hoặc quét thật từ các nguồn mở
-        # Cấu trúc 27 giải chuẩn
         try:
-            # Mô phỏng quét qua request
-            req = urllib.request.Request("https://raw.githubusercontent.com/datasets/lottery-sample/main/today.json", headers=headers)
-            with urllib.request.urlopen(req, timeout=5) as response:
+            req = urllib.request.Request("https://xsmb.me", headers=headers)
+            with urllib.request.urlopen(req, timeout=8) as response:
                 if response.status == 200:
-                    data = json.loads(response.read().decode())
-                    if self.validate_prizes(data):
-                        return data
-        except Exception as e:
-            pass
+                    html = response.read().decode('utf-8', errors='ignore')
+                    
+                    def extract_span(pattern):
+                        m = re.search(pattern, html)
+                        return m.group(1).strip() if m else ""
 
-        # Fallback mẫu dữ liệu chuẩn hóa
+                    gdb = extract_span(r'class="v-gdb\s*">([^<]+)<')
+                    if gdb and len(gdb) >= 5:
+                        prizes = {
+                            "gdb": gdb,
+                            "g1": extract_span(r'class="v-g1\s*">([^<]+)<'),
+                            "g2_1": extract_span(r'class="v-g2-0\s*">([^<]+)<'),
+                            "g2_2": extract_span(r'class="v-g2-1\s*">([^<]+)<'),
+                            "g3_1": extract_span(r'class="v-g3-0\s*">([^<]+)<'),
+                            "g3_2": extract_span(r'class="v-g3-1\s*">([^<]+)<'),
+                            "g3_3": extract_span(r'class="v-g3-2\s*">([^<]+)<'),
+                            "g3_4": extract_span(r'class="v-g3-3\s*">([^<]+)<'),
+                            "g3_5": extract_span(r'class="v-g3-4\s*">([^<]+)<'),
+                            "g3_6": extract_span(r'class="v-g3-5\s*">([^<]+)<'),
+                            "g4_1": extract_span(r'class="v-g4-0\s*">([^<]+)<'),
+                            "g4_2": extract_span(r'class="v-g4-1\s*">([^<]+)<'),
+                            "g4_3": extract_span(r'class="v-g4-2\s*">([^<]+)<'),
+                            "g4_4": extract_span(r'class="v-g4-3\s*">([^<]+)<'),
+                            "g5_1": extract_span(r'class="v-g5-0\s*">([^<]+)<'),
+                            "g5_2": extract_span(r'class="v-g5-1\s*">([^<]+)<'),
+                            "g5_3": extract_span(r'class="v-g5-2\s*">([^<]+)<'),
+                            "g5_4": extract_span(r'class="v-g5-3\s*">([^<]+)<'),
+                            "g5_5": extract_span(r'class="v-g5-4\s*">([^<]+)<'),
+                            "g5_6": extract_span(r'class="v-g5-5\s*">([^<]+)<'),
+                            "g6_1": extract_span(r'class="v-g6-0\s*">([^<]+)<'),
+                            "g6_2": extract_span(r'class="v-g6-1\s*">([^<]+)<'),
+                            "g6_3": extract_span(r'class="v-g6-2\s*">([^<]+)<'),
+                            "g7_1": extract_span(r'class="v-g7-0\s*">([^<]+)<'),
+                            "g7_2": extract_span(r'class="v-g7-1\s*">([^<]+)<'),
+                            "g7_3": extract_span(r'class="v-g7-2\s*">([^<]+)<'),
+                            "g7_4": extract_span(r'class="v-g7-3\s*">([^<]+)<')
+                        }
+
+                        if self.validate_prizes(prizes):
+                            return prizes
+        except Exception as e:
+            print(f"Lỗi cào xsmb.me: {e}")
+
         return None
 
     def validate_prizes(self, raw_prizes):

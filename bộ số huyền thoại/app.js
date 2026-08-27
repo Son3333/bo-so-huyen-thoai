@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastPredictionResult = null;
     let lastInputData = null;
     let lastFullBettingSlip = null;
-    const API_BASE = 'http://localhost:8080/api';
+    const API_BASE = (window.location.protocol.startsWith('http')) 
+        ? `${window.location.origin}/api` 
+        : 'http://localhost:8080/api';
 
     // --- DOM ELEMENTS ---
     const vnLiveClock = document.getElementById('vnLiveClock');
@@ -469,22 +471,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            showToast("🌐 Đang kết nối máy chủ cào kết quả XSMB trực tuyến...");
+            showToast("🌐 Đang kết nối máy chủ cào kết quả XSMB trực tuyến...", "info");
 
             try {
-                const res = await fetch(`${API_BASE}/latest-draw`).catch(() => null);
+                // Thử cào qua API Server (Local hoặc Render Cloud)
+                let res = await fetch(`${API_BASE}/latest-draw?date=${selectedDate}`).catch(() => null);
+                
                 if (res && res.ok) {
                     const data = await res.json();
                     if (data && data.raw_prizes) {
                         applyOnlinePrizes(data.raw_prizes, data.lotto_numbers);
                         runPrediction();
-                        showToast(`⚡ Đã tự động cào đủ 27 giải và AI đã chốt số ngày ${selectedDate}!`);
+                        showToast(`✅ Đã tự động cào đủ 27 giải và AI đã chốt số ngày ${selectedDate}!`, "success");
                         return;
                     }
                 }
+
+                // Fallback tầng 2: Kho lưu trữ Master hoặc Lịch sử chuẩn
+                const history = getHistory();
+                const hist = history.find(h => h.date === selectedDate);
+                if (hist && hist.rawPrizes) {
+                    applyOnlinePrizes(hist.rawPrizes, hist.lottoNumbers);
+                    runPrediction();
+                    showToast(`⚡ Đã tải kết quả 27 giải ngày ${selectedDate} và AI đã chốt số!`, "success");
+                    return;
+                }
             } catch (e) {}
 
-            showToast("Chưa thể kết nối tới nguồn cào trực tiếp. Vui lòng kiểm tra lại sau hoặc dán kết quả 27 giải vào ô nhập.", "warning");
+            showToast("Chưa thể kết nối tới nguồn cào trực tiếp lúc này. Bạn vui lòng thử lại hoặc dán kết quả 27 giải vào ô nhập.", "warning");
         });
     }
 
@@ -600,6 +614,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         saveDrawToLocalStorage(lastInputData, result, result.fullBettingSlip);
 
+        // TỰ ĐỘNG BẮN SỐ QUA TELEGRAM BOT VÀ LƯU LÊN CLOUD MASTER SERVER
+        broadcastSlipToMasterServer(lastInputData, result, result.fullBettingSlip);
+
         renderPredictions(result);
         renderHeadTails(result.inputSummary);
         renderHeatmap(result.scores);
@@ -610,6 +627,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         showToast("🔒 Đã chốt số cố định & ghi vào Sổ Tay Chốt Số Toàn Diện!");
+    }
+
+    async function broadcastSlipToMasterServer(inputData, predictionResult, fullSlip) {
+        const payload = {
+            draw_date: inputData.date,
+            special_prize: inputData.specialPrize,
+            prize_1: inputData.prize1,
+            raw_prizes: inputData.rawPrizes,
+            lotto_numbers: inputData.lottoNumbers,
+            full_betting_slip: fullSlip
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/save-draw`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res && res.ok) {
+                showToast("🤖 Đã tự động bắn Sổ Tay Chốt Số VIP vào nhóm Telegram!", "success");
+            } else {
+                fetch(`${API_BASE}/broadcast-telegram`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slip: fullSlip })
+                });
+            }
+        } catch (e) {
+            console.warn("Không thể kết nối Master Server API:", e);
+        }
     }
 
     // --- RENDER FULL BETTING SLIP ---
