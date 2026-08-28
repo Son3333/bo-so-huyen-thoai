@@ -306,7 +306,12 @@ body {
    =================================================== */
 @media (max-width: 768px) {
     body {
-        padding-bottom: 75px !important; /* Dành khoảng trống cho thanh điều hướng đáy */
+        padding-bottom: 95px !important; /* Dành khoảng trống 95px rộng rãi cho thanh điều hướng đáy */
+    }
+
+    header {
+        height: auto !important;
+        min-height: 3.5rem !important;
     }
 
     .glass-panel {

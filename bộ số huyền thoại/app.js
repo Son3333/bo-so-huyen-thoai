@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lockedData = lockedDays[selectedDate];
 
         if (lockedData) {
-            dailyLockBadge.className = 'px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 flex items-center space-x-1.5';
+            dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
             dailyLockStatusText.textContent = `🔒 Đã Chốt Ngày ${selectedDate}`;
             if (drawDateTag) drawDateTag.textContent = '🔒 Đã Chốt Số Cố Định';
             if (btnRunText) btnRunText.textContent = 'Xem Lại Bản Chốt Cố Định';
@@ -359,11 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const latestLocked = getLatestLockedDay();
             if (latestLocked && !isCurrentUserAdmin()) {
                 // Tự động nạp Sổ chốt mới nhất cho khách VIP xem ngay
-                dailyLockBadge.className = 'px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 flex items-center space-x-1.5';
+                dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
                 dailyLockStatusText.textContent = `🔒 Sổ Chốt Mới Nhất (${latestLocked.drawDate})`;
                 renderLockedPrediction(latestLocked);
             } else {
-                dailyLockBadge.className = 'px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center space-x-1.5';
+                dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 items-center space-x-1.5';
                 dailyLockStatusText.textContent = `🟢 Sẵn sàng nhập kỳ ${selectedDate}`;
                 if (drawDateTag) drawDateTag.textContent = 'Kỳ mới';
                 if (btnRunText) btnRunText.textContent = 'Tự Học & Chốt Số Ngày Mai';
