@@ -366,7 +366,7 @@ class MasterAPIRequestHandler(http.server.SimpleHTTPRequestHandler):
             }, ensure_ascii=False).encode('utf-8'))
             return
 
-        if path == '/admin':
+        if path == '/admin' or path == '/admin/':
             self.path = '/admin.html'
 
         # Phục vụ các file tĩnh (HTML, CSS, JS) cho Web Client
