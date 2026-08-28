@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const predictionOutputCol = document.getElementById('predictionOutputCol');
     const navPredictTitle = document.getElementById('navPredictTitle');
     const adminTabBtns = document.querySelectorAll('.admin-tab-btn');
+    const adminOnlySections = document.querySelectorAll('.admin-only-section');
 
     // Cloud Sync Elements
     const btnOpenCloudModal = document.getElementById('btnOpenCloudModal');
@@ -484,8 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 userProfileBadge.classList.add('hidden');
                 userProfileBadge.classList.remove('flex');
             }
-            if (adminInputCol) adminInputCol.classList.add('hidden');
-            if (predictionOutputCol) predictionOutputCol.className = 'lg:col-span-12 space-y-6';
+            adminOnlySections.forEach(s => s.classList.add('hidden'));
             if (userVipWelcomeBanner) userVipWelcomeBanner.classList.add('hidden');
             adminTabBtns.forEach(t => t.classList.add('hidden'));
 
@@ -511,27 +511,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (role === 'admin') {
-            // GIAO DIỆN QUẢN TRỊ VIÊN ADMIN
+            // GIAO DIỆN QUẢN TRỊ VIÊN ADMIN (TOÀN QUYỀN XEM VÀ THAO TÁC TẤT CẢ)
             if (userRoleIcon) userRoleIcon.textContent = '👑';
             if (userFullNameText) userFullNameText.textContent = user.full_name || 'Admin';
             if (userRoleBadge) {
                 userRoleBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center space-x-1';
             }
-            if (adminInputCol) adminInputCol.classList.remove('hidden');
-            if (predictionOutputCol) predictionOutputCol.className = 'lg:col-span-8 space-y-6';
+            adminOnlySections.forEach(s => s.classList.remove('hidden'));
             if (userVipWelcomeBanner) userVipWelcomeBanner.classList.add('hidden');
             adminTabBtns.forEach(t => t.classList.remove('hidden'));
             if (navPredictTitle) navPredictTitle.textContent = 'Dự Đoán & AI Tự Học';
         } else {
-            // GIAO DIỆN THÀNH VIÊN VIP (USER)
+            // GIAO DIỆN THÀNH VIÊN VIP (USER - CHỈ HIỆN DUY NHẤT SỔ TAY CHỐT SỐ VIP TOÀN MÀN HÌNH)
             if (userRoleIcon) userRoleIcon.textContent = '⭐';
             const displayName = user.full_name || user.username;
             if (userFullNameText) userFullNameText.textContent = displayName;
             if (userRoleBadge) {
                 userRoleBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center space-x-1';
             }
-            if (adminInputCol) adminInputCol.classList.add('hidden');
-            if (predictionOutputCol) predictionOutputCol.className = 'lg:col-span-12 space-y-6';
+            // ẨN TOÀN BỘ BẢNG NẠP, PHÂN TÍCH ĐIỂM, AI ĐỐI SOÁT, MA TRẬN...
+            adminOnlySections.forEach(s => s.classList.add('hidden'));
             if (userVipWelcomeBanner) {
                 userVipWelcomeBanner.classList.remove('hidden');
                 if (vipUsernameText) vipUsernameText.textContent = `${user.username} (${displayName})`;

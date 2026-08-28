@@ -89,17 +89,17 @@
             <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2.5 text-sm font-medium">
                 <button class="nav-tab active flex items-center space-x-2 px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 border border-amber-500/30 transition whitespace-nowrap" data-target="tab-predict">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span id="navPredictTitle">Dự Đoán & Sổ Chốt VIP</span>
+                    <span id="navPredictTitle">Sổ Tay Chốt Số VIP</span>
                 </button>
                 <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-history">
                     <i data-lucide="history" class="w-4 h-4 text-amber-400"></i>
                     <span class="text-amber-300 font-semibold">Tra Cứu Lịch Sử</span>
                 </button>
-                <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-matrix">
+                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-matrix">
                     <i data-lucide="grid" class="w-4 h-4"></i>
                     <span>Ma Trận 100 Số</span>
                 </button>
-                <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-board">
+                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-board">
                     <i data-lucide="table" class="w-4 h-4"></i>
                     <span>Bảng Đầu - Đuôi</span>
                 </button>
@@ -121,8 +121,8 @@
         <!-- TAB 1: DỰ ĐOÁN & AI TỰ HỌC (MAIN TAB) -->
         <section id="tab-predict" class="tab-content space-y-6">
             
-            <!-- Quick Past Slip Navigator Bar -->
-            <div class="glass-panel rounded-2xl p-3.5 border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-900/90 shadow-md">
+            <!-- Quick Past Slip Navigator Bar (Chỉ Admin) -->
+            <div id="quickHistoryBar" class="admin-only-section glass-panel rounded-2xl p-3.5 border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-900/90 shadow-md">
                 <div class="flex items-center space-x-2 text-xs">
                     <span class="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 font-bold">🔍 Tra Cứu Nhanh:</span>
                     <span class="text-gray-300">Xem lại bản chốt số của các ngày trước đó:</span>
@@ -154,8 +154,8 @@
                 </div>
             </div>
 
-            <!-- 🤖 AUTONOMOUS LEARNING & EVALUATION CARD -->
-            <div id="aiEvaluationPanel" class="glass-panel rounded-2xl p-5 border border-amber-500/50 bg-gradient-to-r from-amber-950/30 via-gray-900 to-cyan-950/30 shadow-2xl space-y-4">
+            <!-- 🤖 AUTONOMOUS LEARNING & EVALUATION CARD (Chỉ Admin) -->
+            <div id="aiEvaluationPanel" class="admin-only-section glass-panel rounded-2xl p-5 border border-amber-500/50 bg-gradient-to-r from-amber-950/30 via-gray-900 to-cyan-950/30 shadow-2xl space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/10">
@@ -263,8 +263,8 @@
                 </div>
             </div>
 
-            <!-- Input & Quick Overview Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Input & Quick Overview Grid (Chỉ Admin Mới Được Xem & Thao Tác) -->
+            <div id="adminInputAnalysisRow" class="admin-only-section grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
                 <!-- Left Column: Input Panel (4 Cols - Chỉ Admin được thấy & thao tác) -->
                 <div id="adminInputCol" class="admin-only-section lg:col-span-4 space-y-5">
@@ -1099,21 +1099,21 @@
     <div id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/90 px-3 py-2 flex items-center justify-around text-[10px] font-medium shadow-2xl safe-area-pb">
         <button class="mobile-nav-btn active flex flex-col items-center py-1 px-2.5 text-amber-400 font-bold transition" data-target="tab-predict">
             <i data-lucide="sparkles" class="w-5 h-5 mb-0.5"></i>
-            <span>Dự Đoán AI</span>
+            <span>Sổ Chốt VIP</span>
         </button>
         <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-amber-300 transition" data-target="tab-history">
             <i data-lucide="history" class="w-5 h-5 mb-0.5"></i>
-            <span>Sổ Chốt</span>
+            <span>Tra Cứu</span>
         </button>
-        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-cyan-300 transition" data-target="tab-matrix">
+        <button class="mobile-nav-btn admin-tab-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-cyan-300 transition" data-target="tab-matrix">
             <i data-lucide="grid" class="w-5 h-5 mb-0.5"></i>
             <span>Ma Trận</span>
         </button>
-        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-purple-300 transition" data-target="tab-board">
+        <button class="mobile-nav-btn admin-tab-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-purple-300 transition" data-target="tab-board">
             <i data-lucide="table" class="w-5 h-5 mb-0.5"></i>
             <span>Đầu Đuôi</span>
         </button>
-        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-blue-300 transition" data-target="tab-mysql">
+        <button class="mobile-nav-btn admin-tab-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-blue-300 transition" data-target="tab-mysql">
             <i data-lucide="database" class="w-5 h-5 mb-0.5"></i>
             <span>Dataset</span>
         </button>
