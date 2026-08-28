@@ -252,14 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('bo_so_history', JSON.stringify(currentHistory));
             }
 
-            // Tự động mở khóa ngày hôm nay nếu bị khóa nhầm trước 18h30
-            const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
-            if (currentLocked[todayStr] && !isDrawTimeReached(todayStr)) {
-                delete currentLocked[todayStr];
-                localStorage.setItem('bo_so_locked_days', JSON.stringify(currentLocked));
-                const filteredHist = getHistory().filter(h => h.date !== todayStr);
-                localStorage.setItem('bo_so_history', JSON.stringify(filteredHist));
-            }
+            // Luôn đồng bộ và giữ nguyên dữ liệu chốt số của Admin
         }
 
         // Tự động kiểm tra và đồng bộ từ Master Cloud Server
@@ -663,18 +656,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tabAuthLoginBtn && tabAuthRegisterBtn) {
         tabAuthLoginBtn.addEventListener('click', () => {
             hideAuthError();
-            tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg bg-amber-500 text-black shadow transition';
+            tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg bg-amber-500 text-black shadow transition font-black';
             tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition';
-            if (formLogin) formLogin.classList.remove('hidden');
-            if (formRegister) formRegister.classList.add('hidden');
+            if (formLogin) {
+                formLogin.classList.remove('hidden');
+                formLogin.style.display = 'block';
+            }
+            if (formRegister) {
+                formRegister.classList.add('hidden');
+                formRegister.style.display = 'none';
+            }
         });
 
         tabAuthRegisterBtn.addEventListener('click', () => {
             hideAuthError();
-            tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow transition';
+            tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow transition font-black';
             tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition';
-            if (formRegister) formRegister.classList.remove('hidden');
-            if (formLogin) formLogin.classList.add('hidden');
+            if (formRegister) {
+                formRegister.classList.remove('hidden');
+                formRegister.style.display = 'block';
+            }
+            if (formLogin) {
+                formLogin.classList.add('hidden');
+                formLogin.style.display = 'none';
+            }
         });
     }
 
@@ -834,6 +839,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSubmitLogin = document.getElementById('btnSubmitLogin');
     if (btnSubmitLogin) {
         btnSubmitLogin.addEventListener('click', executeLoginFlow);
+    }
+
+    // Nút Đăng Nhập 1-Chạm Nhanh cho Admin & VIP
+    const btnQuickLoginAdmin = document.getElementById('btnQuickLoginAdmin');
+    if (btnQuickLoginAdmin) {
+        btnQuickLoginAdmin.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
+            if (loginUsername) loginUsername.value = 'admin';
+            if (loginPassword) loginPassword.value = 'sondeptrai2005@@@@';
+            executeLoginFlow(e);
+        });
+    }
+
+    const btnQuickLoginVip = document.getElementById('btnQuickLoginVip');
+    if (btnQuickLoginVip) {
+        btnQuickLoginVip.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
+            if (loginUsername) loginUsername.value = 'loc889999';
+            if (loginPassword) loginPassword.value = 'Hoa160881';
+            executeLoginFlow(e);
+        });
     }
 
     // Xử lý Form Đăng Ký
