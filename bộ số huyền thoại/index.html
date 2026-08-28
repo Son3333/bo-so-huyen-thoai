@@ -71,12 +71,12 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
         <!-- VIP Member Welcome Banner -->
-        <div id="userVipWelcomeBanner" class="glass-panel rounded-2xl p-3.5 sm:p-4 border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-gray-900/90 to-amber-950/30 shadow-xl space-y-2">
+        <div id="userVipWelcomeBanner" class="hidden glass-panel rounded-2xl p-3.5 sm:p-4 border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-gray-900/90 to-amber-950/30 shadow-xl space-y-2">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div class="flex items-center space-x-2.5 min-w-0">
                     <span class="p-1.5 sm:p-2 rounded-xl bg-amber-500/20 text-amber-400 text-base sm:text-lg flex-shrink-0">⭐</span>
                     <div class="min-w-0">
-                        <h3 class="text-xs sm:text-base font-extrabold text-amber-300 truncate">CHÀO MỪNG THÀNH VIÊN VIP: <span id="vipUsernameText" class="text-white">loc889999</span></h3>
+                        <h3 class="text-xs sm:text-base font-extrabold text-amber-300 truncate">CHÀO MỪNG THÀNH VIÊN VIP: <span id="vipUsernameText" class="text-white">VIP Member</span></h3>
                         <p class="text-[11px] sm:text-xs text-gray-400 line-clamp-1">Sổ Tay Chốt Số Toàn Diện đã được Chuyên Gia & AI Master phê duyệt</p>
                     </div>
                 </div>
@@ -309,7 +309,7 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1.5">Tên Đăng Nhập / Tài Khoản:</label>
                     <div class="relative">
-                        <input type="text" id="loginUsername" required placeholder="Nhập tài khoản (admin hoặc user)..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition auth-input-glow font-mono">
+                        <input type="text" id="loginUsername" required placeholder="Nhập tên tài khoản..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition auth-input-glow font-mono">
                         <i data-lucide="user" class="w-4 h-4 text-gray-500 absolute left-3 top-3"></i>
                     </div>
                 </div>
@@ -337,12 +337,12 @@
             <form id="formRegister" class="hidden space-y-3.5">
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Họ & Tên (Khách VIP):</label>
-                    <input type="text" id="regFullName" required placeholder="Ví dụ: Nguyễn Văn Phát Lộc" class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition">
+                    <input type="text" id="regFullName" required placeholder="Nhập họ và tên của bạn..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">Tên Đăng Nhập Tự Chọn:</label>
-                    <input type="text" id="regUsername" required placeholder="Ít nhất 3 ký tự (chữ hoặc số)..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition font-mono">
+                    <input type="text" id="regUsername" required placeholder="Tối thiểu 3 ký tự (chữ hoặc số)..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition font-mono">
                 </div>
 
                 <div>

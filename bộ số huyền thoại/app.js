@@ -523,6 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             adminOnlySections.forEach(s => s.classList.add('hidden'));
             if (userVipWelcomeBanner) userVipWelcomeBanner.classList.add('hidden');
+            if (vipUsernameText) vipUsernameText.textContent = '';
+            if (userFullNameText) userFullNameText.textContent = '';
             adminTabBtns.forEach(t => t.classList.add('hidden'));
 
             if (authModal) {
@@ -724,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     user: { username: 'loc889999', role: 'user', full_name: 'Thành Viên VIP' }
                 };
                 setAuthSession(offlineSession);
-                showToast("⭐ Chào mừng Khách VIP (loc889999)!", "success");
+                showToast("⭐ Chào mừng Thành Viên VIP!", "success");
                 if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
                     setTimeout(() => { window.location.href = 'index.html'; }, 600);
                 }
