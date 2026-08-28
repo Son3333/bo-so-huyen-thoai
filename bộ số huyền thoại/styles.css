@@ -300,3 +300,52 @@ body {
     body { background: #fff; color: #000; }
     .no-print { display: none !important; }
 }
+
+/* ===================================================
+   MOBILE-FIRST ENHANCEMENTS & RESPONSIVE POLISHING
+   =================================================== */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 75px !important; /* Dành khoảng trống cho thanh điều hướng đáy */
+    }
+
+    .glass-panel {
+        padding: 1rem !important;
+        border-radius: 1.25rem !important;
+    }
+
+    /* Tối ưu hóa vùng bấm cảm ứng mượt mà */
+    button, input, select, textarea {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Safe Area insets cho iPhone có tai thỏ / thanh home */
+    .safe-area-pb {
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    }
+
+    /* Chống auto phóng to khó chịu trên bàn phím iOS */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    /* Cuộn ngang/dọc mượt mà trên Safari & Chrome Mobile */
+    .overflow-x-auto, .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ẩn bớt các badge phụ trên màn hình nhỏ */
+    .mobile-compact-badge {
+        font-size: 10px !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+}
+
+.is-mobile .desktop-only {
+    display: none !important;
+}
+
+.is-mobile .mobile-full-width {
+    width: 100% !important;
+}

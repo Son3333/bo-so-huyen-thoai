@@ -396,28 +396,69 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // --- TAB SWITCHING ---
+    // --- MOBILE DETECTION & ADAPTIVE LAYOUT ---
+    function detectMobileAndApplyLayout() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+        if (isMobile) {
+            document.documentElement.classList.add('is-mobile');
+            document.body.classList.add('is-mobile-device');
+        } else {
+            document.documentElement.classList.remove('is-mobile');
+            document.body.classList.remove('is-mobile-device');
+        }
+    }
+    window.addEventListener('resize', detectMobileAndApplyLayout);
+    detectMobileAndApplyLayout();
+
+    // --- TAB SWITCHING (SYNC DESKTOP & MOBILE BOTTOM NAV) ---
     const navTabs = document.querySelectorAll('.nav-tab');
+    const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
+
+    function switchTab(targetId) {
+        navTabs.forEach(t => {
+            if (t.getAttribute('data-target') === targetId) {
+                t.classList.add('active', 'text-amber-400', 'bg-amber-500/10', 'border', 'border-amber-500/30');
+                t.classList.remove('text-gray-400');
+            } else {
+                t.classList.remove('active', 'text-amber-400', 'bg-amber-500/10', 'border', 'border-amber-500/30');
+                t.classList.add('text-gray-400');
+            }
+        });
+
+        mobileNavBtns.forEach(btn => {
+            if (btn.getAttribute('data-target') === targetId) {
+                btn.className = 'mobile-nav-btn active flex flex-col items-center py-1 px-2.5 text-amber-400 font-bold transition scale-105';
+            } else {
+                btn.className = 'mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-amber-300 transition';
+            }
+        });
+
+        tabContents.forEach(c => c.classList.add('hidden'));
+        const activeContent = document.getElementById(targetId);
+        if (activeContent) activeContent.classList.remove('hidden');
+
+        if (targetId === 'tab-rules') renderRulesList();
+        if (targetId === 'tab-history') renderHistoryList();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Cuộn mượt lên đầu trang khi chuyển tab trên điện thoại
+        if (window.innerWidth < 768) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
 
     navTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const targetId = tab.getAttribute('data-target');
-            
-            navTabs.forEach(t => {
-                t.classList.remove('active', 'text-amber-400', 'bg-amber-500/10', 'border', 'border-amber-500/30');
-                t.classList.add('text-gray-400');
-            });
-            tab.classList.add('active', 'text-amber-400', 'bg-amber-500/10', 'border', 'border-amber-500/30');
-            tab.classList.remove('text-gray-400');
+            switchTab(targetId);
+        });
+    });
 
-            tabContents.forEach(c => c.classList.add('hidden'));
-            const activeContent = document.getElementById(targetId);
-            if (activeContent) activeContent.classList.remove('hidden');
-
-            if (targetId === 'tab-rules') renderRulesList();
-            if (targetId === 'tab-history') renderHistoryList();
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+    mobileNavBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            switchTab(targetId);
         });
     });
 
@@ -437,6 +478,27 @@ document.addEventListener('DOMContentLoaded', () => {
         fullBoardContainer.classList.remove('hidden');
         quickInputContainer.classList.add('hidden');
     });
+
+    // --- QUICK PASTE FROM CLIPBOARD (TIỆN LỢI CHO ĐIỆN THOẠI) ---
+    const btnPasteClipboard = document.getElementById('btnPasteClipboard');
+    if (btnPasteClipboard) {
+        btnPasteClipboard.addEventListener('click', async () => {
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text && text.trim()) {
+                        quickInputText.value = text.trim();
+                        const lottoNums = engine.parseQuickInput(text);
+                        quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
+                        showToast(`📋 Đã dán nhanh ${lottoNums.length} số từ bộ nhớ tạm!`, "success");
+                        return;
+                    }
+                }
+            } catch (e) {}
+            quickInputText.focus();
+            showToast("Hãy nhấn giữ vào ô nhập và chọn 'Dán' (Paste)", "info");
+        });
+    }
 
     quickInputText.addEventListener('input', () => {
         const lottoNums = engine.parseQuickInput(quickInputText.value);

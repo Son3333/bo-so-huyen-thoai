@@ -268,10 +268,16 @@
 
                         <!-- Quick Text Mode -->
                         <div id="quickInputContainer" class="space-y-2">
-                            <label class="block text-xs text-gray-400">
-                                Dán chuỗi 27 giải hoặc các số lô 2 số đã về:
-                            </label>
-                            <textarea id="quickInputText" rows="5" placeholder="Ví dụ: 89, 45, 23, 01, 76, 54, 99, 12, 34, 67, 88..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-sm text-amber-300 font-mono focus:outline-none focus:border-amber-500 transition placeholder-gray-600 resize-none"></textarea>
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs text-gray-400">
+                                    Dán chuỗi 27 giải hoặc các số lô 2 số đã về:
+                                </label>
+                                <button id="btnPasteClipboard" type="button" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center space-x-1 transition shadow active:scale-95" title="Dán kết quả vừa sao chép từ Zalo/Facebook/Web">
+                                    <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 text-amber-400"></i>
+                                    <span>📋 Dán Nhanh</span>
+                                </button>
+                            </div>
+                            <textarea id="quickInputText" rows="4" placeholder="Ví dụ: 89, 45, 23, 01, 76, 54, 99, 12, 34, 67, 88..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-sm text-amber-300 font-mono focus:outline-none focus:border-amber-500 transition placeholder-gray-600 resize-none"></textarea>
                             <div class="flex items-center justify-between text-[11px] text-gray-500">
                                 <span id="quickCountBadge">Đã nhận: 0 số</span>
                                 <span>Tách bằng dấu phẩy, cách hoặc xuống dòng</span>
@@ -282,65 +288,65 @@
                         <div id="fullBoardContainer" class="hidden space-y-3 max-h-80 overflow-y-auto pr-1">
                             <div>
                                 <label class="text-[11px] font-bold text-red-400">Giải Đặc Biệt (GĐB):</label>
-                                <input type="text" id="g_gdb" placeholder="Ví dụ: 84723" class="w-full bg-gray-900 border border-red-500/40 rounded-lg px-2.5 py-1.5 text-sm font-bold text-red-400 font-mono">
+                                <input type="text" id="g_gdb" inputmode="numeric" pattern="[0-9]*" placeholder="Ví dụ: 84723" class="w-full bg-gray-900 border border-red-500/40 rounded-lg px-2.5 py-1.5 text-sm font-bold text-red-400 font-mono">
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-amber-400">Giải Nhất (G1):</label>
-                                <input type="text" id="g_g1" placeholder="Ví dụ: 59389" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-mono">
+                                <input type="text" id="g_g1" inputmode="numeric" pattern="[0-9]*" placeholder="Ví dụ: 59389" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-mono">
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-blue-400">Giải Nhì (2 giải):</label>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" id="g_g2_1" placeholder="G2.1" class="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-mono">
-                                    <input type="text" id="g_g2_2" placeholder="G2.2" class="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-mono">
+                                    <input type="text" id="g_g2_1" inputmode="numeric" pattern="[0-9]*" placeholder="G2.1" class="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-mono">
+                                    <input type="text" id="g_g2_2" inputmode="numeric" pattern="[0-9]*" placeholder="G2.2" class="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-mono">
                                 </div>
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-green-400">Giải Ba (6 giải):</label>
                                 <div class="grid grid-cols-3 gap-1.5">
-                                    <input type="text" id="g_g3_1" placeholder="G3.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_2" placeholder="G3.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_3" placeholder="G3.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_4" placeholder="G3.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_5" placeholder="G3.5" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_6" placeholder="G3.6" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g3_1" inputmode="numeric" pattern="[0-9]*" placeholder="G3.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g3_2" inputmode="numeric" pattern="[0-9]*" placeholder="G3.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g3_3" inputmode="numeric" pattern="[0-9]*" placeholder="G3.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g3_4" inputmode="numeric" pattern="[0-9]*" placeholder="G3.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g3_5" inputmode="numeric" pattern="[0-9]*" placeholder="G3.5" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g3_6" inputmode="numeric" pattern="[0-9]*" placeholder="G3.6" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
                                 </div>
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-cyan-400">Giải Tư (4 giải):</label>
                                 <div class="grid grid-cols-2 gap-1.5">
-                                    <input type="text" id="g_g4_1" placeholder="G4.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g4_2" placeholder="G4.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g4_3" placeholder="G4.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g4_4" placeholder="G4.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g4_1" inputmode="numeric" pattern="[0-9]*" placeholder="G4.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g4_2" inputmode="numeric" pattern="[0-9]*" placeholder="G4.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g4_3" inputmode="numeric" pattern="[0-9]*" placeholder="G4.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g4_4" inputmode="numeric" pattern="[0-9]*" placeholder="G4.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
                                 </div>
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-purple-400">Giải Năm (6 giải):</label>
                                 <div class="grid grid-cols-3 gap-1.5">
-                                    <input type="text" id="g_g5_1" placeholder="G5.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_2" placeholder="G5.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_3" placeholder="G5.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_4" placeholder="G5.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_5" placeholder="G5.5" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_6" placeholder="G5.6" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g5_1" inputmode="numeric" pattern="[0-9]*" placeholder="G5.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g5_2" inputmode="numeric" pattern="[0-9]*" placeholder="G5.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g5_3" inputmode="numeric" pattern="[0-9]*" placeholder="G5.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g5_4" inputmode="numeric" pattern="[0-9]*" placeholder="G5.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g5_5" inputmode="numeric" pattern="[0-9]*" placeholder="G5.5" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g5_6" inputmode="numeric" pattern="[0-9]*" placeholder="G5.6" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
                                 </div>
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-emerald-400">Giải Sáu (3 giải):</label>
                                 <div class="grid grid-cols-3 gap-1.5">
-                                    <input type="text" id="g_g6_1" placeholder="G6.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g6_2" placeholder="G6.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g6_3" placeholder="G6.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g6_1" inputmode="numeric" pattern="[0-9]*" placeholder="G6.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g6_2" inputmode="numeric" pattern="[0-9]*" placeholder="G6.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g6_3" inputmode="numeric" pattern="[0-9]*" placeholder="G6.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
                                 </div>
                             </div>
                             <div>
                                 <label class="text-[11px] font-semibold text-rose-400">Giải Bảy (4 giải):</label>
                                 <div class="grid grid-cols-4 gap-1.5">
-                                    <input type="text" id="g_g7_1" placeholder="G7.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g7_2" placeholder="G7.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g7_3" placeholder="G7.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g7_4" placeholder="G7.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g7_1" inputmode="numeric" pattern="[0-9]*" placeholder="G7.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g7_2" inputmode="numeric" pattern="[0-9]*" placeholder="G7.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g7_3" inputmode="numeric" pattern="[0-9]*" placeholder="G7.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
+                                    <input type="text" id="g_g7_4" inputmode="numeric" pattern="[0-9]*" placeholder="G7.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
                                 </div>
                             </div>
                         </div>
@@ -1045,6 +1051,30 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- 📱 MOBILE BOTTOM NAVIGATION BAR (Dành riêng cho màn hình Điện Thoại) -->
+    <div id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/90 px-3 py-2 flex items-center justify-around text-[10px] font-medium shadow-2xl safe-area-pb">
+        <button class="mobile-nav-btn active flex flex-col items-center py-1 px-2.5 text-amber-400 font-bold transition" data-target="tab-predict">
+            <i data-lucide="sparkles" class="w-5 h-5 mb-0.5"></i>
+            <span>Dự Đoán AI</span>
+        </button>
+        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-amber-300 transition" data-target="tab-history">
+            <i data-lucide="history" class="w-5 h-5 mb-0.5"></i>
+            <span>Sổ Chốt</span>
+        </button>
+        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-cyan-300 transition" data-target="tab-matrix">
+            <i data-lucide="grid" class="w-5 h-5 mb-0.5"></i>
+            <span>Ma Trận</span>
+        </button>
+        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-purple-300 transition" data-target="tab-board">
+            <i data-lucide="table" class="w-5 h-5 mb-0.5"></i>
+            <span>Đầu Đuôi</span>
+        </button>
+        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-blue-300 transition" data-target="tab-mysql">
+            <i data-lucide="database" class="w-5 h-5 mb-0.5"></i>
+            <span>Dataset</span>
+        </button>
     </div>
 
     <!-- Scripts -->
