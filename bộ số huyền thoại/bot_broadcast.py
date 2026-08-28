@@ -39,6 +39,7 @@ def format_telegram_slip_message(slip_data):
     dan_de_20 = ", ".join(dac_biet.get("danDe20", ["--"]))
     dan_de_36 = ", ".join(dac_biet.get("danDe36", ["--"]))
 
+    cang_de_vip = " - ".join(ba_cang.get("baCangDeVIP", ["--"]))
     cang_vip = " - ".join(ba_cang.get("baCangLoVIP", ["--"]))
     dan_3_cang = ", ".join(ba_cang.get("danBaCang", ["--"]))
 
@@ -64,6 +65,7 @@ def format_telegram_slip_message(slip_data):
 • <b>Dàn Đề 36 Số:</b> <code>{dan_de_36}</code>
 
 🔮 <b>4. BA CÀNG ĐỈNH CAO:</b>
+• <b>3 Càng Đề VIP:</b> <code>{cang_de_vip}</code> 🔮
 • <b>3 Càng Lô VIP:</b> <code>{cang_vip}</code>
 • <b>Dàn 3 Càng Đẹp:</b> <code>{dan_3_cang}</code>
 
