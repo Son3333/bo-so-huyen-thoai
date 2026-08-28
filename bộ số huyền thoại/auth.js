@@ -1,4 +1,4 @@
-﻿/**
+/**
  * BỘ SỐ HUYỀN THOẠI - AUTHENTICATION & RBAC CONTROLLER (auth.js)
  * Quản lý phiên làm việc, Phân quyền Quản trị / Khách VIP, Cổng bảo mật & Đăng nhập/Đăng ký
  */
@@ -462,28 +462,6 @@ function initAuthEventListeners() {
     }
     if (btnSubmitLogin) {
         btnSubmitLogin.addEventListener('click', executeLoginFlow);
-    }
-
-    if (btnQuickLoginAdmin) {
-        btnQuickLoginAdmin.addEventListener('click', (e) => {
-            if (e) e.preventDefault();
-            const u = document.getElementById('loginUsername');
-            const p = document.getElementById('loginPassword');
-            if (u) u.value = 'admin';
-            if (p) p.value = 'sondeptrai2005@@@@';
-            executeLoginFlow(e);
-        });
-    }
-
-    if (btnQuickLoginVip) {
-        btnQuickLoginVip.addEventListener('click', (e) => {
-            if (e) e.preventDefault();
-            const u = document.getElementById('loginUsername');
-            const p = document.getElementById('loginPassword');
-            if (u) u.value = 'loc889999';
-            if (p) p.value = 'Hoa160881';
-            executeLoginFlow(e);
-        });
     }
 
     if (formRegister) {

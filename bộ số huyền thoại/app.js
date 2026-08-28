@@ -842,27 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmitLogin.addEventListener('click', executeLoginFlow);
     }
 
-    // Nút Đăng Nhập 1-Chạm Nhanh cho Admin & VIP
-    const btnQuickLoginAdmin = document.getElementById('btnQuickLoginAdmin');
-    if (btnQuickLoginAdmin) {
-        btnQuickLoginAdmin.addEventListener('click', (e) => {
-            if (e) e.preventDefault();
-            if (loginUsername) loginUsername.value = 'admin';
-            if (loginPassword) loginPassword.value = 'sondeptrai2005@@@@';
-            executeLoginFlow(e);
-        });
-    }
-
-    const btnQuickLoginVip = document.getElementById('btnQuickLoginVip');
-    if (btnQuickLoginVip) {
-        btnQuickLoginVip.addEventListener('click', (e) => {
-            if (e) e.preventDefault();
-            if (loginUsername) loginUsername.value = 'loc889999';
-            if (loginPassword) loginPassword.value = 'Hoa160881';
-            executeLoginFlow(e);
-        });
-    }
-
     // Xử lý Form Đăng Ký
     async function executeRegisterFlow(e) {
         if (e) {
