@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function syncFromMasterServer() {
         try {
-            const res = await fetch(`${API_BASE}/canonical-slip`);
+            const res = await fetch(`${getApiBase()}/canonical-slip`);
             if (res.ok) {
                 const json = await res.json();
                 if (json && json.data && json.data.drawDate) {
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CHECK MYSQL STATUS ---
     checkMySQLStatus();
     function checkMySQLStatus() {
-        fetch(`${API_BASE}/status`, { method: 'GET' })
+        fetch(`${getApiBase()}/status`, { method: 'GET' })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'connected') {
@@ -591,10 +591,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 4. Thử Cào Trực Tiếp qua các cổng CORS Proxy mở tốc độ cao
+        const dateParts = selectedDate ? selectedDate.split('-') : [];
+        let dateUrl = 'https://xsmb.me';
+        if (dateParts.length === 3) {
+            dateUrl = `https://xsmb.me/kqxsmb-ngay-${dateParts[2]}-${dateParts[1]}-${dateParts[0]}.html`;
+        }
+
         const proxyUrls = [
-            'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://xsmb.me'),
-            'https://corsproxy.io/?' + encodeURIComponent('https://xsmb.me'),
-            'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent('https://xsmb.me')
+            'https://api.allorigins.win/raw?url=' + encodeURIComponent(dateUrl),
+            'https://corsproxy.io/?' + encodeURIComponent(dateUrl),
+            'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(dateUrl),
+            'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://xsmb.me')
         ];
 
         for (const pUrl of proxyUrls) {
@@ -710,7 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // TỰ ĐỘNG ĐỐI CHIẾU HÔM QUA & HỌC TĂNG CƯỜNG
         let evalResult = null;
         let learningEntry = null;
-        const activePastPred = getActivePrediction();
+        const activePastPred = getActivePrediction(selectedDate);
         if (activePastPred) {
             evalResult = engine.evaluatePastPrediction(lottoNumbers, specialPrize, activePastPred, rawPrizes);
             if (evalResult) {
@@ -741,6 +748,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveActivePrediction({
             date: selectedDate,
             recommendations: result.recommendations,
+            fullBettingSlip: result.fullBettingSlip,
             reasons: result.reasons
         });
 
@@ -1213,22 +1221,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function getActivePrediction() {
+    function getActivePrediction(beforeDate) {
         try {
             const s = localStorage.getItem('bo_so_active_prediction');
-            if (s) return JSON.parse(s);
+            if (s) {
+                const parsed = JSON.parse(s);
+                if (!beforeDate || parsed.date < beforeDate) {
+                    return parsed;
+                }
+            }
         } catch (e) {}
 
-        // Fallback: Tự động lấy bản dự đoán của ngày khóa gần nhất làm mốc đối chiếu
+        // Fallback: Tìm ngày đã khóa gần nhất TRƯỚC ngày được chọn
         const lockedDays = getLockedDays();
-        const dates = Object.keys(lockedDays).sort().reverse();
+        const dates = Object.keys(lockedDays).filter(d => !beforeDate || d < beforeDate).sort().reverse();
         if (dates.length > 0) {
             const last = lockedDays[dates[0]];
-            if (last && last.predictionResult) {
+            if (last) {
                 return {
                     date: last.drawDate,
-                    recommendations: last.predictionResult.recommendations,
-                    reasons: last.predictionResult.reasons
+                    recommendations: last.predictionResult ? last.predictionResult.recommendations : (last.recommendations || {}),
+                    fullBettingSlip: last.fullBettingSlip || (last.predictionResult ? last.predictionResult.fullBettingSlip : null),
+                    reasons: last.predictionResult ? last.predictionResult.reasons : (last.reasons || {})
                 };
             }
         }
@@ -1436,7 +1450,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lotto_numbers: lastInputData.lottoNumbers
         };
 
-        fetch(`${API_BASE}/save-draw`, {
+        fetch(`${getApiBase()}/save-draw`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
