@@ -35,8 +35,10 @@
 </head>
 <body class="bg-[#0B0F19] text-gray-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Top Navigation Header for Admin Master -->
-    <header class="border-b border-amber-500/30 bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 shadow-lg shadow-amber-500/5">
+    <!-- Ứng dụng chính Admin (Bị ẩn mặc định cho tới khi Quản trị viên đăng nhập thành công) -->
+    <div id="appLayout" class="hidden min-h-screen flex flex-col">
+        <!-- Top Navigation Header for Admin Master -->
+        <header class="border-b border-amber-500/30 bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 shadow-lg shadow-amber-500/5">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0 flex-shrink">
                 <img src="icon.png" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-amber-500/20 object-cover border border-amber-500/40 flex-shrink-0">
@@ -1124,9 +1126,10 @@
             <span>Dataset</span>
         </button>
     </div>
+    </div>
 
-    <!-- 🛡️ MODAL ĐĂNG NHẬP & ĐĂNG KÝ BẢO MẬT (CYBER-GOLD AUTH GATE) -->
-    <div id="authModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <!-- 🛡️ MÀN HÌNH ĐĂNG NHẬP BẮT BUỘC CHO QUẢN TRỊ VIÊN (CYBER-GOLD AUTH GATE) -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-[#0B0F19] flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-amber-500/40 bg-gray-950/95 shadow-2xl shadow-amber-500/10 animate-modal-in space-y-5 max-h-[90vh] overflow-y-auto">
             <!-- Modal Header -->
             <div class="flex items-center justify-between border-b border-gray-800 pb-4">
@@ -1137,9 +1140,6 @@
                         <p class="text-[11px] text-gray-400">Hệ Thống Phân Quyền Thương Mại VIP</p>
                     </div>
                 </div>
-                <button id="btnCloseAuthModal" class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-gray-800 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
             </div>
 
             <!-- Tab Switcher: Đăng Nhập vs Đăng Ký -->

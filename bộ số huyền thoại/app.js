@@ -179,6 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateVietnamClock, 1000);
     updateVietnamClock();
 
+    // 🛡️ XÁC THỰC NGƯỜI DÙNG NGAY TỨC THÌ KHI MỞ WEB
+    applyAuthUIState();
+
     // Setup initial draw date (Today VN)
     const todayVN = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
     
@@ -517,9 +520,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyAuthUIState() {
         const session = getAuthSession();
+        const appLayout = document.getElementById('appLayout');
 
         if (!session || !session.user) {
-            // Chưa đăng nhập: Bật modal đăng nhập bắt buộc
+            // Chưa đăng nhập: BẮT BUỘC KHÓA TOÀN BỘ GIAO DIỆN, CHỈ HIỆN MÀN HÌNH ĐĂNG NHẬP
+            if (appLayout) {
+                appLayout.classList.add('hidden');
+                appLayout.classList.remove('flex');
+            }
+            if (authModal) {
+                authModal.classList.remove('hidden');
+                authModal.classList.add('flex');
+            }
             if (btnLoginTrigger) btnLoginTrigger.classList.remove('hidden');
             if (btnGoToAdmin) {
                 btnGoToAdmin.classList.add('hidden');
@@ -534,26 +546,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (vipUsernameText) vipUsernameText.textContent = '';
             if (userFullNameText) userFullNameText.textContent = '';
             adminTabBtns.forEach(t => t.classList.add('hidden'));
-
-            if (authModal) {
-                authModal.classList.remove('hidden');
-                authModal.classList.add('flex');
-            }
             return;
         }
 
         const user = session.user;
         const role = user.role || 'user';
 
+        // ĐÃ ĐĂNG NHẬP: MỞ KHÓA GIAO DIỆN CHÍNH, ẨN MÀN HÌNH ĐĂNG NHẬP
+        if (appLayout) {
+            appLayout.classList.remove('hidden');
+            appLayout.classList.add('flex');
+        }
+        if (authModal) {
+            authModal.classList.add('hidden');
+            authModal.classList.remove('flex');
+        }
+
         if (btnLoginTrigger) btnLoginTrigger.classList.add('hidden');
         if (userProfileBadge) {
             userProfileBadge.classList.remove('hidden');
             userProfileBadge.classList.add('flex');
-        }
-
-        if (authModal) {
-            authModal.classList.add('hidden');
-            authModal.classList.remove('flex');
         }
 
         if (role === 'admin') {

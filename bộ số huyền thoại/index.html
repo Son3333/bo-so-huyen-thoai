@@ -26,8 +26,10 @@
 </head>
 <body class="bg-[#0B0F19] text-gray-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Top Navigation Header -->
-    <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur-md sticky top-0 z-50">
+    <!-- Ứng dụng chính (Bị ẩn mặc định cho tới khi người dùng đăng nhập thành công) -->
+    <div id="appLayout" class="hidden min-h-screen flex flex-col">
+        <!-- Top Navigation Header -->
+        <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-shrink">
                 <img src="icon.png" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-amber-500/20 object-cover border border-amber-500/40 flex-shrink-0">
@@ -266,9 +268,10 @@
         </div>
 
     </main>
+    </div>
 
-    <!-- 🔐 MODAL ĐĂNG NHẬP & ĐĂNG KÝ THÀNH VIÊN VIP (CYBER-GOLD) -->
-    <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4">
+    <!-- 🔐 MÀN HÌNH ĐĂNG NHẬP & ĐĂNG KÝ BẮT BUỘC (BẢO VỆ TUYỆT ĐỐI) -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-[#0B0F19] flex items-center justify-center p-3 sm:p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-5 sm:p-7 border border-amber-500/40 bg-gray-950/95 shadow-2xl shadow-amber-500/10 space-y-5 animate-modal-in max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-gray-800/90 pb-4">
                 <div class="flex items-center space-x-2.5">
@@ -280,9 +283,6 @@
                         <p class="text-[11px] text-gray-400 font-medium">Bộ Số Huyền Thoại • Hệ Thống VIP</p>
                     </div>
                 </div>
-                <button id="btnCloseAuthModal" class="p-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
             </div>
 
             <!-- Tab Switcher: Đăng Nhập vs Đăng Ký -->
