@@ -199,7 +199,19 @@ document.addEventListener('DOMContentLoaded', () => {
     populateQuickHistorySelect();
     checkDailyLockStatus();
     initCloudStatusUI();
-    syncCanonicalSlipFromCloud(todayVN);
+
+    // Tự động tải bản chốt số mới nhất cho người dùng
+    syncCanonicalSlipFromCloud();
+
+    // Đồng bộ thời gian thực cho Client VIP (mỗi 15s tự động cập nhật bản chốt mới nhất nếu Admin vừa chốt)
+    if (!isCurrentUserAdmin()) {
+        setInterval(() => {
+            syncCanonicalSlipFromCloud();
+        }, 15000);
+        window.addEventListener('focus', () => {
+            syncCanonicalSlipFromCloud();
+        });
+    }
 
     function syncInitialCanonicalData() {
         if (typeof CANONICAL_INITIAL_DATA !== 'undefined' && CANONICAL_INITIAL_DATA.lockedDays) {
@@ -1283,12 +1295,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function syncCanonicalSlipFromCloud(selectedDate) {
         const targets = [];
-        const primaryApi = `${getApiBase()}/canonical-slip?date=${selectedDate}`;
+        const queryParam = selectedDate ? `?date=${selectedDate}` : '';
+        const primaryApi = `${getApiBase()}/canonical-slip${queryParam}`;
         targets.push(primaryApi);
 
         const cloudUrl = getCloudServerUrl();
         if (cloudUrl && !primaryApi.startsWith(cloudUrl)) {
-            targets.push(`${cloudUrl}/api/canonical-slip?date=${selectedDate}`);
+            targets.push(`${cloudUrl}/api/canonical-slip${queryParam}`);
         }
 
         for (const url of targets) {
@@ -1296,45 +1309,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch(url, { cache: 'no-cache' }).catch(() => null);
                 if (res && res.ok) {
                     const json = await res.json();
-                    if (json && json.data && json.data.full_betting_slip) {
-                        const lockedDays = getLockedDays();
-                        const currentLocked = lockedDays[selectedDate];
+                    if (json && json.data) {
+                        const payload = json.data;
+                        const slip = payload.full_betting_slip || payload.fullBettingSlip;
+                        const actualDate = payload.drawDate || payload.draw_date || selectedDate || (slip && slip.drawDate);
 
-                        const canonData = {
-                            drawDate: selectedDate,
-                            inputData: {
-                                date: selectedDate,
-                                lottoNumbers: json.data.lotto_numbers || [],
-                                specialPrize: json.data.special_prize || '',
-                                prize1: json.data.prize_1 || '',
-                                rawPrizes: json.data.raw_prizes || {}
-                            },
-                            predictionResult: {
-                                recommendations: {
-                                    bachThu: json.data.full_betting_slip.baoLo.btl,
-                                    songThu: json.data.full_betting_slip.baoLo.stl,
-                                    dan4: json.data.full_betting_slip.baoLo.dan4,
-                                    chamDe: json.data.full_betting_slip.dacBiet.chamDe
+                        if (slip && actualDate) {
+                            const lockedDays = getLockedDays();
+                            const currentLocked = lockedDays[actualDate];
+
+                            const canonData = {
+                                drawDate: actualDate,
+                                inputData: {
+                                    date: actualDate,
+                                    lottoNumbers: (payload.inputData && payload.inputData.lottoNumbers) || payload.lotto_numbers || [],
+                                    specialPrize: (payload.inputData && payload.inputData.specialPrize) || payload.special_prize || '',
+                                    prize1: (payload.inputData && payload.inputData.prize1) || payload.prize_1 || '',
+                                    rawPrizes: (payload.inputData && payload.inputData.rawPrizes) || payload.raw_prizes || {}
                                 },
-                                fullBettingSlip: json.data.full_betting_slip
-                            },
-                            fullBettingSlip: json.data.full_betting_slip,
-                            lockedAt: new Date().toISOString()
-                        };
+                                predictionResult: payload.predictionResult || {
+                                    recommendations: {
+                                        bachThu: (slip.baoLo && slip.baoLo.btl) || '34',
+                                        songThu: (slip.baoLo && slip.baoLo.stl) || ['34', '43'],
+                                        dan4: (slip.baoLo && slip.baoLo.dan4) || [],
+                                        chamDe: (slip.dacBiet && slip.dacBiet.chamDe) || []
+                                    },
+                                    fullBettingSlip: slip
+                                },
+                                fullBettingSlip: slip,
+                                lockedAt: payload.lockedAt || new Date().toISOString()
+                            };
 
-                        if (!currentLocked || JSON.stringify(currentLocked.fullBettingSlip) !== JSON.stringify(canonData.fullBettingSlip)) {
-                            saveLockedDay(selectedDate, canonData);
-                            if (inputDrawDate && inputDrawDate.value === selectedDate) {
+                            const isNewOrUpdated = !currentLocked || JSON.stringify(currentLocked.fullBettingSlip) !== JSON.stringify(slip);
+                            if (isNewOrUpdated) {
+                                saveLockedDay(actualDate, canonData);
+                            }
+
+                            // Cho User hoặc khi Admin đang ở đúng ngày -> Render ngay lập tức!
+                            if (!isCurrentUserAdmin() || (inputDrawDate && inputDrawDate.value === actualDate)) {
                                 renderLockedPrediction(canonData);
-                                showToast(`☁️ Đã tự động đồng bộ Sổ Chốt ngày ${selectedDate} từ Cloud!`, "info");
                             }
                             return true;
-                        } else if (!lastFullBettingSlip && inputDrawDate && inputDrawDate.value === selectedDate) {
-                            renderLockedPrediction(canonData);
                         }
                     }
                 }
             } catch (e) {}
+        }
+
+        // Fallback Offline: Nếu mất mạng thì nạp ngày mới nhất trong bộ nhớ máy
+        if (!isCurrentUserAdmin()) {
+            const latestLocked = getLatestLockedDay();
+            if (latestLocked) {
+                renderLockedPrediction(latestLocked);
+            }
         }
         return false;
     }
