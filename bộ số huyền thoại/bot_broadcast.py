@@ -18,8 +18,22 @@ DEFAULT_TELEGRAM_CONFIG = {
 def format_telegram_slip_message(slip_data):
     """
     Định dạng Sổ Tay Chốt Số thành tin nhắn Telegram chuẩn phong cách Hoàng Gia VIP
+    Ghi rõ: Căn cứ từ kết quả ngày nạp -> Dự đoán ĐÁNH CHO NGÀY TIẾP THEO (NGÀY MAI)
     """
-    draw_date = slip_data.get("drawDate", "Hôm Nay")
+    import datetime
+    base_date = slip_data.get("drawDate", datetime.datetime.now().strftime("%Y-%m-%d"))
+    
+    # Tính ngày đánh (ngày tiếp theo)
+    target_date_vn = base_date
+    base_date_vn = base_date
+    try:
+        dt = datetime.datetime.strptime(base_date, "%Y-%m-%d")
+        next_dt = dt + datetime.timedelta(days=1)
+        base_date_vn = dt.strftime("%d/%m/%Y")
+        target_date_vn = next_dt.strftime("%d/%m/%Y")
+    except Exception:
+        pass
+
     bao_lo = slip_data.get("baoLo", {})
     lo_xien = slip_data.get("loXien", {})
     dac_biet = slip_data.get("dacBiet", {})
@@ -43,11 +57,11 @@ def format_telegram_slip_message(slip_data):
     cang_vip = " - ".join(ba_cang.get("baCangLoVIP", ["--"]))
     dan_3_cang = ", ".join(ba_cang.get("danBaCang", ["--"]))
 
-    msg = f"""👑 <b>BỘ SỐ HUYỀN THOẠI - SỔ TAY CHỐT SỐ NGÀY {draw_date}</b> 👑
-<i>(Hệ thống AI Tự Học Tăng Cường • Đã Niêm Phong Cố Định)</i>
+    msg = f"""👑 <b>BỘ SỐ HUYỀN THOẠI - SỔ TAY CHỐT SỐ ĐÁNH NGÀY {target_date_vn}</b> 👑
+<i>(🎯 Mục Tiêu Đánh Ngày: <b>{target_date_vn}</b> • Phân tích từ kỳ quay ngày {base_date_vn})</i>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-⭐ <b>1. BAO LÔ TÔ CAO CẤP:</b>
+⭐ <b>1. BAO LÔ TÔ CAO CẤP (ĐÁNH NGÀY {target_date_vn}):</b>
 • <b>Bạch Thủ Lô VIP:</b> <code>{btl}</code> 🔥
 • <b>Song Thủ Lô VIP:</b> <code>{stl}</code>
 • <b>Dàn Lô 4 Con:</b> <code>{dan4}</code>
@@ -70,7 +84,7 @@ def format_telegram_slip_message(slip_data):
 • <b>Dàn 3 Càng Đẹp:</b> <code>{dan_3_cang}</code>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ <i>Chúc toàn thể anh em hôm nay rực rỡ và đại thắng!</i> 🍀"""
+⚡ <i>Chúc toàn thể anh em đánh ngày <b>{target_date_vn}</b> rực rỡ và đại thắng!</i> 🍀"""
     return msg
 
 def send_telegram_broadcast(slip_data, bot_token=None, chat_id=None):

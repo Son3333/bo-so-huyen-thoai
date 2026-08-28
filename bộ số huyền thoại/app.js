@@ -185,8 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (inputDrawDate) {
         inputDrawDate.value = todayVN;
+        updateTargetPlayDateDisplay();
         inputDrawDate.addEventListener('change', () => {
             checkDailyLockStatus();
+            updateTargetPlayDateDisplay();
             syncCanonicalSlipFromCloud(inputDrawDate.value);
         });
     }
@@ -1372,6 +1374,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- HELPER DATE CALCULATIONS (NGÀY CĂN CỨ -> NGÀY ĐÁNH TIẾP THEO) ---
+    function getNextDay(dateStr) {
+        if (!dateStr) return '';
+        try {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                d.setDate(d.getDate() + 1);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+        } catch (e) {}
+        return dateStr;
+    }
+
+    function formatDateVN(dateStr) {
+        if (!dateStr) return '';
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return dateStr;
+    }
+
+    function updateTargetPlayDateDisplay() {
+        const baseDate = inputDrawDate ? inputDrawDate.value : '';
+        const targetDate = getNextDay(baseDate);
+        const targetBadge = document.getElementById('targetPlayDateBadge');
+        if (targetBadge && targetDate) {
+            targetBadge.textContent = formatDateVN(targetDate);
+        }
+    }
+    if (inputDrawDate) {
+        inputDrawDate.addEventListener('change', updateTargetPlayDateDisplay);
+        inputDrawDate.addEventListener('input', updateTargetPlayDateDisplay);
+    }
+
     // --- RENDER FULL BETTING SLIP ---
     function renderFullBettingSlip(slip) {
         if (!slip) return;
@@ -1380,6 +1421,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const x = slip.loXien || {};
         const d = slip.dacBiet || {};
         const c = slip.baCang || {};
+
+        const baseDate = slip.drawDate || (inputDrawDate ? inputDrawDate.value : '');
+        const targetPlayDate = getNextDay(baseDate);
+
+        const slipTargetDateText = document.getElementById('slipTargetDateText');
+        const slipTargetDateSub = document.getElementById('slipTargetDateSub');
+        const slipBaseDateText = document.getElementById('slipBaseDateText');
+
+        if (slipTargetDateText) slipTargetDateText.textContent = formatDateVN(targetPlayDate);
+        if (slipTargetDateSub) slipTargetDateSub.textContent = formatDateVN(targetPlayDate);
+        if (slipBaseDateText) slipBaseDateText.textContent = formatDateVN(baseDate);
 
         slipBTL.textContent = b.btl || '--';
         slipSTL.textContent = (b.stl && b.stl.join(' - ')) || '--';
@@ -1440,10 +1492,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const d = s.dacBiet || {};
         const c = s.baCang || {};
 
+        const baseDate = s.drawDate || (inputDrawDate ? inputDrawDate.value : '');
+        const targetPlayDate = getNextDay(baseDate);
+        const targetDateVN = formatDateVN(targetPlayDate);
+        const baseDateVN = formatDateVN(baseDate);
+
         return `======================================\n` +
-            `⚡ SỔ TAY CHỐT SỐ TOÀN DIỆN - NGÀY ${s.drawDate || ''}\n` +
+            `👑 BỘ SỐ HUYỀN THOẠI - SỔ TAY CHỐT SỐ ĐÁNH NGÀY ${targetDateVN}\n` +
+            `🎯 Mục tiêu đánh ngày: ${targetDateVN} (Căn cứ từ kỳ quay ngày ${baseDateVN})\n` +
             `======================================\n\n` +
-            `⭐ 1. BAO LÔ TÔ:\n` +
+            `⭐ 1. BAO LÔ TÔ (ĐÁNH NGÀY ${targetDateVN}):\n` +
             `• Bạch Thủ Lô VIP: ${b.btl || '--'}\n` +
             `• Song Thủ Lô VIP: ${(b.stl && b.stl.join(' - ')) || '--'}\n` +
             `• Lô Kép Đẹp: ${(b.topKep && b.topKep.join(', ')) || '--'}\n` +
@@ -1468,7 +1526,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `• 3 Càng Lô VIP: ${(c.baCangLoVIP && c.baCangLoVIP.join(' - ')) || '--'}\n` +
             `• 3 Càng Đề VIP: ${(c.baCangDeVIP && c.baCangDeVIP.join(' - ')) || '--'}\n` +
             `• Dàn 3 Càng: ${(c.danBaCang && c.danBaCang.join(', ')) || '--'}\n\n` +
-            `Chúc bạn may mắn và thắng lớn hôm nay!`;
+            `Chúc anh em đánh ngày ${targetDateVN} may mắn và thắng lớn!`;
     }
 
     window.copySection = function(section) {

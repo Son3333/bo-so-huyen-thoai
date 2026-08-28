@@ -272,7 +272,7 @@
                         <div class="flex items-center justify-between pb-3 border-b border-gray-800">
                             <div class="flex items-center space-x-2">
                                 <i data-lucide="arrow-down-to-dot" class="w-5 h-5 text-amber-400"></i>
-                                <h2 class="font-bold text-gray-100">Nạp Kết Quả Hôm Nay</h2>
+                                <h2 class="font-bold text-gray-100">Nạp Kết Quả Kỳ Mở Thưởng</h2>
                             </div>
                             <span id="drawDateTag" class="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-400">Kỳ mới</span>
                         </div>
@@ -280,13 +280,20 @@
                         <!-- Date input -->
                         <div>
                             <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-semibold text-gray-400">Ngày quay thưởng:</label>
+                                <label class="block text-xs font-semibold text-gray-400">Kỳ mở thưởng căn cứ:</label>
                                 <button id="btnAutoFetchOnline" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-xs font-bold text-white transition flex items-center space-x-1 shadow animate-pulse" title="Tự động cào kết quả từ Internet">
                                     <i data-lucide="globe" class="w-3.5 h-3.5"></i>
                                     <span>🌐 Tự Động Lấy Online</span>
                                 </button>
                             </div>
-                            <input type="date" id="inputDrawDate" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-amber-500 transition">
+                            <input type="date" id="inputDrawDate" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-amber-500 transition font-mono">
+                            <div class="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-300 flex items-center justify-between font-medium">
+                                <span class="flex items-center space-x-1.5">
+                                    <i data-lucide="target" class="w-3.5 h-3.5 text-amber-400"></i>
+                                    <span>🎯 Dự đoán đánh cho ngày mai:</span>
+                                </span>
+                                <strong id="targetPlayDateBadge" class="text-white font-bold bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">--/--/----</strong>
+                            </div>
                         </div>
 
                         <!-- Mode Switch -->
@@ -508,13 +515,15 @@
                         <div class="flex items-center space-x-2">
                             <span class="text-xl">📋</span>
                             <h2 class="font-black text-lg sm:text-xl text-amber-400 uppercase tracking-wide">
-                                SỔ TAY CHỐT SỐ TOÀN DIỆN THAM KHẢO
+                                SỔ TAY CHỐT SỐ ĐÁNH NGÀY: <span id="slipTargetDateText" class="text-white drop-shadow">--/--/----</span>
                             </h2>
                             <span id="slipLockBadge" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold">
                                 🔒 ĐÃ CHỐT CỐ ĐỊNH
                             </span>
                         </div>
-                        <p class="text-xs text-gray-400 mt-1">Đầy đủ tất cả các thể loại Bao Lô, Lô Xiên, Xiên Quay, Dàn Đề 10-20-36-64 số, Ba Càng để người chơi tham khảo đánh</p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            🎯 Mục tiêu đánh ngày: <strong id="slipTargetDateSub" class="text-amber-300">--</strong> • Phân tích từ kỳ mở thưởng ngày: <span id="slipBaseDateText" class="text-gray-300 font-semibold">--</span>
+                        </p>
                     </div>
 
                     <!-- Actions -->
