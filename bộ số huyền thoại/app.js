@@ -1632,15 +1632,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- COPY & PRINT FULL SLIP ---
     if (btnCopyFullSlip) {
         btnCopyFullSlip.addEventListener('click', () => {
-            if (!lastFullBettingSlip) {
+            const slip = lastFullBettingSlip || (getLatestLockedDay() && getLatestLockedDay().fullBettingSlip);
+            if (!slip) {
                 showToast("Chưa có sổ chốt số để copy!");
                 return;
             }
-            const text = formatSlipToText(lastFullBettingSlip);
+            const text = formatSlipToText(slip);
             navigator.clipboard.writeText(text).then(() => {
-                showToast("📋 Đã sao chép toàn bộ Sổ Tay Chốt Số vào Clipboard!");
+                showToast("📋 Đã sao chép toàn bộ Sổ Tay Chốt Số vào Clipboard!", "success");
             }).catch(() => {
-                showToast("Đã copy sổ chốt!");
+                showToast("Đã copy sổ chốt!", "info");
             });
         });
     }
@@ -1690,30 +1691,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.copySection = function(section) {
-        if (!lastFullBettingSlip) {
-            showToast("Chưa có dữ liệu!");
+        const s = lastFullBettingSlip || (getLatestLockedDay() && getLatestLockedDay().fullBettingSlip);
+        if (!s) {
+            showToast("Chưa có dữ liệu sổ chốt!");
             return;
         }
-        const s = lastFullBettingSlip;
         const b = s.baoLo || {};
         const x = s.loXien || {};
         const d = s.dacBiet || {};
         const c = s.baCang || {};
+        const baseDate = s.drawDate || (inputDrawDate ? inputDrawDate.value : '');
+        const targetPlayDate = getNextDay(baseDate);
+        const targetDateVN = formatDateVN(targetPlayDate);
         let text = '';
 
         if (section === 'baoLo') {
-            text = `[BAO LÔ NGÀY ${s.drawDate || ''}]\nBTL: ${b.btl || '--'} | STL: ${(b.stl && b.stl.join('-')) || '--'} | Dàn 4: ${(b.dan4 && b.dan4.join('-')) || '--'} | Dàn 8: ${(b.dan8 && b.dan8.join('-')) || '--'}`;
+            text = `[⭐ BAO LÔ TÔ ĐÁNH NGÀY ${targetDateVN}]\n• BTL: ${b.btl || '--'}\n• STL: ${(b.stl && b.stl.join(' - ')) || '--'}\n• Kép: ${(b.topKep && b.topKep.join(', ')) || '--'}\n• Dàn 4: ${(b.dan4 && b.dan4.join(' - ')) || '--'}\n• Dàn 8: ${(b.dan8 && b.dan8.join(' - ')) || '--'}\n• Dàn 10: ${(b.dan10 && b.dan10.join(', ')) || '--'}`;
         } else if (section === 'loXien') {
-            text = `[LÔ XIÊN NGÀY ${s.drawDate || ''}]\nXiên 2: ${(x.xien2 && x.xien2.map(i => i.join('-')).join(', ')) || '--'}\nXiên 3: ${(x.xien3 && x.xien3.map(i => i.join('-')).join(', ')) || '--'}\nXiên Quay: [${(x.xienQuay4 && x.xienQuay4.join(', ')) || '--'}]`;
+            text = `[🎯 LÔ XIÊN & XIÊN QUAY ĐÁNH NGÀY ${targetDateVN}]\n• Xiên 2: ${(x.xien2 && x.xien2.map(i => `(${i.join('-')})`).join('  ')) || '--'}\n• Xiên 3: ${(x.xien3 && x.xien3.map(i => `(${i.join('-')})`).join('  ')) || '--'}\n• Xiên 4: ${(x.xien4 && x.xien4.map(i => `(${i.join('-')})`).join('  ')) || '--'}\n• Xiên Quay 4: [${(x.xienQuay4 && x.xienQuay4.join(', ')) || '--'}]`;
         } else if (section === 'dacBiet') {
-            text = `[ĐẶC BIỆT & DÀN ĐỀ NGÀY ${s.drawDate || ''}]\nĐề BTL: ${d.deBTL || '--'} | Đề STL: ${(d.deSTL && d.deSTL.join('-')) || '--'}\nChạm: ${(d.chamDe && d.chamDe.join(',')) || '--'}\nDàn 10: ${(d.danDe10 && d.danDe10.join(', ')) || '--'}\nDàn 36: ${(d.danDe36 && d.danDe36.join(', ')) || '--'}`;
+            text = `[👑 GIẢI ĐẶC BIỆT & DÀN ĐỀ ĐÁNH NGÀY ${targetDateVN}]\n• Đề BTL: ${d.deBTL || '--'}\n• Đề STL: ${(d.deSTL && d.deSTL.join(' - ')) || '--'}\n• Chạm: [${(d.chamDe && d.chamDe.join(',')) || '--'}] | Tổng: [${(d.topSums && d.topSums.join(',')) || '--'}]\n• Dàn 10: ${(d.danDe10 && d.danDe10.join(', ')) || '--'}\n• Dàn 20: ${(d.danDe20 && d.danDe20.join(', ')) || '--'}\n• Dàn 36: ${(d.danDe36 && d.danDe36.join(', ')) || '--'}\n• Dàn 64: ${(d.danDe64 && d.danDe64.join(', ')) || '--'}`;
         } else if (section === 'baCang') {
-            text = `[3 CÀNG NGÀY ${s.drawDate || ''}]\n3 Càng Lô: ${(c.baCangLoVIP && c.baCangLoVIP.join(' - ')) || '--'}\n3 Càng Đề: ${(c.baCangDeVIP && c.baCangDeVIP.join(' - ')) || '--'}`;
+            text = `[🔮 BA CÀNG ĐÁNH NGÀY ${targetDateVN}]\n• Càng: [${(c.topCangs && c.topCangs.join(',')) || '--'}]\n• 3 Càng Lô: ${(c.baCangLoVIP && c.baCangLoVIP.join(' - ')) || '--'}\n• 3 Càng Đề: ${(c.baCangDeVIP && c.baCangDeVIP.join(' - ')) || '--'}\n• Dàn 3 Càng: ${(c.danBaCang && c.danBaCang.join(', ')) || '--'}`;
         }
 
         if (text) {
             navigator.clipboard.writeText(text).then(() => {
-                showToast("📋 Đã copy mục này vào Clipboard!");
+                showToast("📋 Đã copy mục này vào Clipboard!", "success");
+            }).catch(() => {
+                showToast("Đã copy mục!", "info");
             });
         }
     };

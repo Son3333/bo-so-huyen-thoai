@@ -9,6 +9,8 @@ import http.server
 import socketserver
 import json
 import urllib.parse
+import urllib.request
+import re
 import os
 import datetime
 import sys
@@ -592,6 +594,7 @@ class MasterAPIRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
 if __name__ == '__main__':
+    socketserver.TCPServer.allow_reuse_address = True
     server_address = ('', PORT)
     httpd = socketserver.TCPServer(server_address, MasterAPIRequestHandler)
     print(f"==================================================================")
