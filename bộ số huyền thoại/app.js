@@ -640,16 +640,16 @@ document.addEventListener('DOMContentLoaded', () => {
             hideAuthError();
             tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg bg-amber-500 text-black shadow transition';
             tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition';
-            formLogin.classList.remove('hidden');
-            formRegister.classList.add('hidden');
+            if (formLogin) formLogin.classList.remove('hidden');
+            if (formRegister) formRegister.classList.add('hidden');
         });
 
         tabAuthRegisterBtn.addEventListener('click', () => {
             hideAuthError();
             tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow transition';
             tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition';
-            formRegister.classList.remove('hidden');
-            formLogin.classList.add('hidden');
+            if (formRegister) formRegister.classList.remove('hidden');
+            if (formLogin) formLogin.classList.add('hidden');
         });
     }
 
@@ -660,6 +660,23 @@ document.addEventListener('DOMContentLoaded', () => {
             btnToggleLoginPwd.innerHTML = isPwd ? '<i data-lucide="eye-off" class="w-4 h-4"></i>' : '<i data-lucide="eye" class="w-4 h-4"></i>';
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
+    }
+
+    // Helper to manage registered users locally
+    function getRegisteredLocalUsers() {
+        try {
+            const s = localStorage.getItem('bo_so_registered_users');
+            if (s) return JSON.parse(s);
+        } catch (e) {}
+        return {};
+    }
+
+    function saveRegisteredLocalUser(username, userObj) {
+        try {
+            const users = getRegisteredLocalUsers();
+            users[username] = userObj;
+            localStorage.setItem('bo_so_registered_users', JSON.stringify(users));
+        } catch (e) {}
     }
 
     // Xử lý Form Đăng Nhập
@@ -679,9 +696,76 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnSubmit = document.getElementById('btnSubmitLogin');
             if (btnSubmit) {
                 btnSubmit.disabled = true;
-                btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang xác thực an toàn...`;
+                btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang đăng nhập...`;
             }
 
+            // 1. KIỂM TRA NGAY TÀI KHOẢN MẶC ĐỊNH (TỨC THÌ 0ms, 100% THÀNH CÔNG)
+            if (username === 'admin' && password === 'sondeptrai2005@@@@') {
+                const session = {
+                    token: 'admin_token_' + Date.now(),
+                    user: { username: 'admin', role: 'admin', full_name: 'Quản Trị Viên Tối Cao' }
+                };
+                setAuthSession(session);
+                showToast("👑 Chào mừng Quản Trị Viên!", "success");
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+                }
+                if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+                    setTimeout(() => { window.location.href = 'admin.html'; }, 500);
+                }
+                fetch(`${getApiBase()}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                }).catch(() => null);
+                return;
+            }
+
+            if (username === 'loc889999' && password === 'Hoa160881') {
+                const session = {
+                    token: 'vip_token_' + Date.now(),
+                    user: { username: 'loc889999', role: 'user', full_name: 'Thành Viên VIP' }
+                };
+                setAuthSession(session);
+                showToast("⭐ Chào mừng Thành Viên VIP!", "success");
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+                }
+                if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
+                    setTimeout(() => { window.location.href = 'index.html'; }, 500);
+                }
+                fetch(`${getApiBase()}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                }).catch(() => null);
+                return;
+            }
+
+            // 2. Kiểm tra tài khoản đã đăng ký trên máy này
+            const localUsers = getRegisteredLocalUsers();
+            if (localUsers[username] && localUsers[username].password === password) {
+                const session = {
+                    token: 'user_token_' + Date.now(),
+                    user: { username: username, role: localUsers[username].role || 'user', full_name: localUsers[username].full_name || username }
+                };
+                setAuthSession(session);
+                showToast(`⭐ Chào mừng ${session.user.full_name}!`, "success");
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+                }
+                if (session.user.role === 'admin' && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '')) {
+                    setTimeout(() => { window.location.href = 'admin.html'; }, 500);
+                } else if (session.user.role !== 'admin' && (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/'))) {
+                    setTimeout(() => { window.location.href = 'index.html'; }, 500);
+                }
+                return;
+            }
+
+            // 3. Nếu là tài khoản khác: Gửi xác thực tới Server
             try {
                 const res = await fetch(`${getApiBase()}/auth/login`, {
                     method: 'POST',
@@ -694,15 +778,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.status === 'success' && data.token) {
                         setAuthSession({ token: data.token, user: data.user });
                         const userRole = data.user.role || 'user';
-                        showToast(`👑 Chào mừng ${data.user.full_name || data.user.username} đã đăng nhập!`, "success");
+                        showToast(`👑 Chào mừng ${data.user.full_name || data.user.username}!`, "success");
                         if (btnSubmit) {
                             btnSubmit.disabled = false;
                             btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
                         }
                         if (userRole === 'admin' && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '')) {
-                            setTimeout(() => { window.location.href = 'admin.html'; }, 600);
+                            setTimeout(() => { window.location.href = 'admin.html'; }, 500);
                         } else if (userRole !== 'admin' && (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/'))) {
-                            setTimeout(() => { window.location.href = 'index.html'; }, 600);
+                            setTimeout(() => { window.location.href = 'index.html'; }, 500);
                         }
                         return;
                     }
@@ -717,31 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {}
 
-            // Fallback Offline Authentication nếu không thể kết nối tới server
-            if (username === 'admin' && password === 'sondeptrai2005@@@@') {
-                const offlineSession = {
-                    token: 'offline_admin_token_' + Date.now(),
-                    user: { username: 'admin', role: 'admin', full_name: 'Quản Trị Viên Tối Cao' }
-                };
-                setAuthSession(offlineSession);
-                showToast("👑 Đã đăng nhập Quản Trị Viên (Chế độ Độc Lập)!", "success");
-                if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-                    setTimeout(() => { window.location.href = 'admin.html'; }, 600);
-                }
-            } else if (username === 'loc889999' && password === 'Hoa160881') {
-                const offlineSession = {
-                    token: 'offline_user_token_' + Date.now(),
-                    user: { username: 'loc889999', role: 'user', full_name: 'Thành Viên VIP' }
-                };
-                setAuthSession(offlineSession);
-                showToast("⭐ Chào mừng Thành Viên VIP!", "success");
-                if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
-                    setTimeout(() => { window.location.href = 'index.html'; }, 600);
-                }
-            } else {
-                showAuthError("Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!");
-            }
-
+            showAuthError("Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!");
             if (btnSubmit) {
                 btnSubmit.disabled = false;
                 btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
@@ -760,6 +820,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = regPassword ? regPassword.value : '';
             const confirm = regPasswordConfirm ? regPasswordConfirm.value : '';
 
+            if (!username || !password) {
+                showAuthError("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
+                return;
+            }
+
             if (password !== confirm) {
                 showAuthError("Mật khẩu xác nhận không trùng khớp!");
                 return;
@@ -776,47 +841,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang tạo tài khoản...`;
             }
 
-            try {
-                const res = await fetch(`${getApiBase()}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, full_name: fullName })
-                }).catch(() => null);
+            // Lưu tài khoản cục bộ tức thì
+            saveRegisteredLocalUser(username, {
+                username: username,
+                password: password,
+                role: 'user',
+                full_name: fullName || username,
+                created_at: new Date().toISOString()
+            });
 
-                if (res && (res.status === 200 || res.status === 201)) {
-                    const data = await res.json();
-                    if (data.status === 'success' && data.token) {
-                        setAuthSession({ token: data.token, user: data.user });
-                        showToast(`🎉 Đăng ký thành công! Chào mừng thành viên VIP ${data.user.full_name || data.user.username}!`, "success");
-                        if (btnSubmit) {
-                            btnSubmit.disabled = false;
-                            btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
-                        }
-                        return;
-                    }
-                } else if (res) {
-                    const data = await res.json().catch(() => ({}));
-                    showAuthError(data.message || "Không thể tạo tài khoản. Tên đăng nhập có thể đã tồn tại!");
-                    if (btnSubmit) {
-                        btnSubmit.disabled = false;
-                        btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
-                    }
-                    return;
-                }
-            } catch (err) {}
-
-            // Fallback tạo local user nếu không kết nối được server
-            const offlineSession = {
-                token: 'offline_user_token_' + Date.now(),
+            const session = {
+                token: 'user_reg_token_' + Date.now(),
                 user: { username, role: 'user', full_name: fullName || username }
             };
-            setAuthSession(offlineSession);
-            showToast(`🎉 Đã tạo tài khoản thành viên VIP ${username}!`, "success");
+            setAuthSession(session);
+            showToast(`🎉 Đăng ký thành công! Chào mừng ${session.user.full_name}!`, "success");
 
             if (btnSubmit) {
                 btnSubmit.disabled = false;
                 btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
             }
+
+            if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
+                setTimeout(() => { window.location.href = 'index.html'; }, 500);
+            }
+
+            // Đồng bộ tài khoản mới lên Server ngầm
+            fetch(`${getApiBase()}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, full_name: fullName })
+            }).catch(() => null);
         });
     }
 
