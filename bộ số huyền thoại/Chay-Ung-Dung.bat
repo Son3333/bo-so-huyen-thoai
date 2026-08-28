@@ -7,8 +7,8 @@ set "EDGE_PATH=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 if not exist "%EDGE_PATH%" set "EDGE_PATH=C:\Program Files\Microsoft\Edge\Application\msedge.exe"
 
 if exist "%EDGE_PATH%" (
-    start "" "%EDGE_PATH%" --app="file:///%~dp0index.html" --window-size=1300,850
+    start "" "%EDGE_PATH%" --app="https://bo-so-huyen-thoai.onrender.com/" --window-size=1300,850
 ) else (
-    start "" "%~dp0index.html"
+    start https://bo-so-huyen-thoai.onrender.com/
 )
 exit

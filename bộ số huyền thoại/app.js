@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastFullBettingSlip = null;
 
     function getCloudServerUrl() {
-        return (localStorage.getItem('bo_so_cloud_server_url') || 'https://bo-so-huyen-thoai-master.onrender.com').trim().replace(/\/+$/, '');
+        return (localStorage.getItem('bo_so_cloud_server_url') || 'https://bo-so-huyen-thoai.onrender.com').trim().replace(/\/+$/, '');
     }
 
     function getApiBase() {
