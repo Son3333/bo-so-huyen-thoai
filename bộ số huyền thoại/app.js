@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🛡️ XÁC THỰC NGƯỜI DÙNG NGAY TỨC THÌ KHI MỞ WEB
     applyAuthUIState();
+    if (typeof initAuthEventListeners === 'function') initAuthEventListeners();
 
     // Setup initial draw date (Today VN)
     const todayVN = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
