@@ -308,12 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnViewSelectedHistory) {
         btnViewSelectedHistory.addEventListener('click', () => {
-            const chosen = quickHistorySelect.value;
+            const chosen = quickHistorySelect ? quickHistorySelect.value : '';
             if (!chosen) {
                 showToast("Vui lòng chọn 1 ngày trong danh sách!");
                 return;
             }
-            inputDrawDate.value = chosen;
+            if (inputDrawDate) inputDrawDate.value = chosen;
             checkDailyLockStatus();
             showToast(`📂 Đã mở lại Sổ Tay Chốt Số ngày ${chosen}!`);
         });
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (quickHistorySelect) {
         quickHistorySelect.addEventListener('change', () => {
             if (quickHistorySelect.value) {
-                inputDrawDate.value = quickHistorySelect.value;
+                if (inputDrawDate) inputDrawDate.value = quickHistorySelect.value;
                 checkDailyLockStatus();
             }
         });
@@ -353,6 +353,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dates.length > 0) {
             return lockedDays[dates[0]];
         }
+        if (typeof CANONICAL_INITIAL_DATA !== 'undefined' && CANONICAL_INITIAL_DATA.lockedDays) {
+            const cDates = Object.keys(CANONICAL_INITIAL_DATA.lockedDays).sort().reverse();
+            if (cDates.length > 0) {
+                return CANONICAL_INITIAL_DATA.lockedDays[cDates[0]];
+            }
+        }
         return null;
     }
 
@@ -370,7 +376,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderLockedPrediction(lockedData);
         } else {
             const latestLocked = getLatestLockedDay();
-            if (latestLocked && !isCurrentUserAdmin()) {
+            const isIndexPage = !document.getElementById('adminInputCol');
+            if (latestLocked && (isIndexPage || !isCurrentUserAdmin())) {
                 // Tự động nạp Sổ chốt mới nhất cho khách VIP xem ngay
                 if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
                 if (dailyLockStatusText) dailyLockStatusText.textContent = `🔒 Sổ Chốt Mới Nhất (${latestLocked.drawDate})`;
@@ -440,6 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CHECK MYSQL STATUS ---
     checkMySQLStatus();
     function checkMySQLStatus() {
+        if (!mysqlStatusBadge) return;
         fetch(`${getApiBase()}/status`, { method: 'GET' })
             .then(res => res.json())
             .then(data => {
@@ -660,8 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             hideAuthError();
 
-            const username = loginUsername.value.trim().toLowerCase();
-            const password = loginPassword.value;
+            const username = loginUsername ? loginUsername.value.trim().toLowerCase() : '';
+            const password = loginPassword ? loginPassword.value : '';
 
             if (!username || !password) {
                 showAuthError("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
@@ -747,10 +755,10 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             hideAuthError();
 
-            const fullName = regFullName.value.trim();
-            const username = regUsername.value.trim().toLowerCase();
-            const password = regPassword.value;
-            const confirm = regPasswordConfirm.value;
+            const fullName = regFullName ? regFullName.value.trim() : '';
+            const username = regUsername ? regUsername.value.trim().toLowerCase() : '';
+            const password = regPassword ? regPassword.value : '';
+            const confirm = regPasswordConfirm ? regPasswordConfirm.value : '';
 
             if (password !== confirm) {
                 showAuthError("Mật khẩu xác nhận không trùng khớp!");
@@ -1138,13 +1146,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyOnlinePrizes(rawPrizes, lottoNums) {
-        Object.keys(rawPrizes).forEach(k => {
-            const el = document.getElementById('g_' + k);
-            if (el) el.value = rawPrizes[k];
-        });
+        if (rawPrizes) {
+            Object.keys(rawPrizes).forEach(k => {
+                const el = document.getElementById('g_' + k);
+                if (el) el.value = rawPrizes[k];
+            });
+        }
         if (lottoNums && lottoNums.length > 0) {
-            quickInputText.value = lottoNums.join(', ');
-            quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
+            if (quickInputText) quickInputText.value = lottoNums.join(', ');
+            if (quickCountBadge) quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
         }
     }
 
@@ -2343,7 +2353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Window helper functions for history actions
     window.viewHistoricalDay = function(dateStr) {
-        inputDrawDate.value = dateStr;
+        if (inputDrawDate) inputDrawDate.value = dateStr;
         checkDailyLockStatus();
         
         // Switch to Tab 1
