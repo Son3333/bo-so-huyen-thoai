@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userRoleBadge = document.getElementById('userRoleBadge');
     const userRoleIcon = document.getElementById('userRoleIcon');
     const userFullNameText = document.getElementById('userFullNameText');
+    const btnGoToAdmin = document.getElementById('btnGoToAdmin');
     const btnLogoutBtn = document.getElementById('btnLogoutBtn');
     const tabAuthLoginBtn = document.getElementById('tabAuthLoginBtn');
     const tabAuthRegisterBtn = document.getElementById('tabAuthRegisterBtn');
@@ -498,6 +499,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!session || !session.user) {
             // Chưa đăng nhập: Bật modal đăng nhập bắt buộc
             if (btnLoginTrigger) btnLoginTrigger.classList.remove('hidden');
+            if (btnGoToAdmin) {
+                btnGoToAdmin.classList.add('hidden');
+                btnGoToAdmin.classList.remove('flex');
+            }
             if (userProfileBadge) {
                 userProfileBadge.classList.add('hidden');
                 userProfileBadge.classList.remove('flex');
@@ -529,6 +534,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (role === 'admin') {
             // GIAO DIỆN QUẢN TRỊ VIÊN ADMIN (TOÀN QUYỀN XEM VÀ THAO TÁC TẤT CẢ)
+            if (btnGoToAdmin) {
+                btnGoToAdmin.classList.remove('hidden');
+                btnGoToAdmin.classList.add('flex');
+            }
             if (userRoleIcon) userRoleIcon.textContent = '👑';
             if (userFullNameText) userFullNameText.textContent = user.full_name || 'Admin';
             if (userRoleBadge) {
@@ -540,6 +549,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (navPredictTitle) navPredictTitle.textContent = 'Dự Đoán & AI Tự Học';
         } else {
             // GIAO DIỆN THÀNH VIÊN VIP (USER - CHỈ HIỆN DUY NHẤT SỔ TAY CHỐT SỐ VIP TOÀN MÀN HÌNH)
+            if (btnGoToAdmin) {
+                btnGoToAdmin.classList.add('hidden');
+                btnGoToAdmin.classList.remove('flex');
+            }
             if (userRoleIcon) userRoleIcon.textContent = '⭐';
             const displayName = user.full_name || user.username;
             if (userFullNameText) userFullNameText.textContent = displayName;

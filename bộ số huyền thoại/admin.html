@@ -35,32 +35,34 @@
 </head>
 <body class="bg-[#0B0F19] text-gray-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
 
-    <!-- Top Navigation Header -->
-    <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur-md sticky top-0 z-50">
+    <!-- Top Navigation Header for Admin Master -->
+    <header class="border-b border-amber-500/30 bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 shadow-lg shadow-amber-500/5">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
-            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-shrink">
+            <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0 flex-shrink">
                 <img src="icon.png" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-amber-500/20 object-cover border border-amber-500/40 flex-shrink-0">
                 <div class="min-w-0">
-                    <h1 class="text-sm sm:text-lg font-black tracking-tight bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 bg-clip-text text-transparent truncate">
-                        BỘ SỐ HUYỀN THOẠI
-                    </h1>
-                    <p class="hidden sm:block text-[11px] text-gray-400 font-medium truncate">Sổ Tay Chốt Số Toàn Diện VIP</p>
+                    <div class="flex items-center space-x-1.5">
+                        <h1 class="text-sm sm:text-lg font-black tracking-tight bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 bg-clip-text text-transparent truncate">
+                            ADMIN MASTER DASHBOARD
+                        </h1>
+                        <span class="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-[10px] font-black text-amber-300">👑 QUẢN TRỊ</span>
+                    </div>
+                    <p class="hidden sm:block text-[11px] text-gray-400 font-medium truncate">Bộ Số Huyền Thoại • Hệ Thống Nạp Số & Điều Khiển AI Master</p>
                 </div>
             </div>
 
-            <!-- Header Clock & User Auth & Daily Lock Status & Cloud Sync -->
+            <!-- Header Clock & Controls -->
             <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
+                <a id="btnGoToClient" href="index.html" class="px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-bold text-gray-200 hover:text-white flex items-center space-x-1.5 transition shadow" title="Chuyển sang xem giao diện của Khách Hàng VIP">
+                    <i data-lucide="eye" class="w-3.5 h-3.5 text-amber-400"></i>
+                    <span class="hidden sm:inline">Xem Trang Khách VIP</span>
+                </a>
+                <a id="btnGoToAdmin" href="admin.html" class="hidden"></a>
+
                 <!-- User Profile / Role Badge -->
-                <div id="userSessionContainer" class="flex items-center space-x-1 sm:space-x-1.5">
-                    <a id="btnGoToAdmin" href="admin.html" class="hidden px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black text-[11px] sm:text-xs items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition whitespace-nowrap" title="Mở Bảng Điều Khiển Quản Trị Viên (Admin Dashboard)">
-                        <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-                        <span>👑 Quản Trị</span>
-                    </a>
-                    <button id="btnLoginTrigger" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-extrabold text-[11px] sm:text-xs flex items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition whitespace-nowrap">
-                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-                        <span>Đăng Nhập</span>
-                    </button>
-                    <div id="userProfileBadge" class="hidden items-center space-x-1">
+                <div id="userSessionContainer" class="flex items-center space-x-1">
+                    <button id="btnLoginTrigger" class="hidden"></button>
+                    <div id="userProfileBadge" class="flex items-center space-x-1">
                         <span id="userRoleBadge" class="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center space-x-1 max-w-[120px] sm:max-w-[160px] truncate">
                             <span id="userRoleIcon">👑</span>
                             <span id="userFullNameText" class="truncate">Admin</span>
@@ -87,8 +89,8 @@
         </div>
     </header>
 
-    <!-- Main Navigation Tabs (Chỉ Hiện Trên Máy Tính / Desktop) -->
-    <div class="hidden md:block border-b border-gray-800 bg-gray-900/40">
+    <!-- Main Navigation Tabs -->
+    <div class="border-b border-gray-800 bg-gray-900/40 sticky top-14 sm:top-16 z-40 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2.5 text-sm font-medium">
                 <button class="nav-tab active flex items-center space-x-2 px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 border border-amber-500/30 transition whitespace-nowrap" data-target="tab-predict">
