@@ -334,6 +334,15 @@ document.addEventListener('DOMContentLoaded', () => {
         checkDailyLockStatus();
     }
 
+    function getLatestLockedDay() {
+        const lockedDays = getLockedDays();
+        const dates = Object.keys(lockedDays).sort().reverse();
+        if (dates.length > 0) {
+            return lockedDays[dates[0]];
+        }
+        return null;
+    }
+
     function checkDailyLockStatus() {
         const selectedDate = inputDrawDate.value || todayVN;
         const lockedDays = getLockedDays();
@@ -347,14 +356,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderLockedPrediction(lockedData);
         } else {
-            dailyLockBadge.className = 'px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center space-x-1.5';
-            dailyLockStatusText.textContent = `🟢 Sẵn sàng nhập kỳ ${selectedDate}`;
-            if (drawDateTag) drawDateTag.textContent = 'Kỳ mới';
-            if (btnRunText) btnRunText.textContent = 'Tự Học & Chốt Số Ngày Mai';
-            
-            // Reset mốc hiển thị sẵn sàng cho kỳ mới
-            renderInitialEvaluationState();
-            resetPredictionDisplay();
+            const latestLocked = getLatestLockedDay();
+            if (latestLocked && !isCurrentUserAdmin()) {
+                // Tự động nạp Sổ chốt mới nhất cho khách VIP xem ngay
+                dailyLockBadge.className = 'px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 flex items-center space-x-1.5';
+                dailyLockStatusText.textContent = `🔒 Sổ Chốt Mới Nhất (${latestLocked.drawDate})`;
+                renderLockedPrediction(latestLocked);
+            } else {
+                dailyLockBadge.className = 'px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center space-x-1.5';
+                dailyLockStatusText.textContent = `🟢 Sẵn sàng nhập kỳ ${selectedDate}`;
+                if (drawDateTag) drawDateTag.textContent = 'Kỳ mới';
+                if (btnRunText) btnRunText.textContent = 'Tự Học & Chốt Số Ngày Mai';
+                
+                // Reset mốc hiển thị sẵn sàng cho kỳ mới
+                renderInitialEvaluationState();
+                resetPredictionDisplay();
+            }
         }
     }
 
@@ -1289,6 +1306,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 showToast(`☁️ Đã tự động đồng bộ Sổ Chốt ngày ${selectedDate} từ Cloud!`, "info");
                             }
                             return true;
+                        } else if (!lastFullBettingSlip && inputDrawDate && inputDrawDate.value === selectedDate) {
+                            renderLockedPrediction(canonData);
                         }
                     }
                 }
