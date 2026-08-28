@@ -473,6 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('bo_so_auth_session', JSON.stringify(session));
         } catch (e) {}
         applyAuthUIState();
+        checkDailyLockStatus();
+        syncCanonicalSlipFromCloud();
     }
 
     function clearAuthSession() {
@@ -560,6 +562,13 @@ document.addEventListener('DOMContentLoaded', () => {
             adminTabBtns.forEach(t => t.classList.remove('hidden'));
             if (navPredictTitle) navPredictTitle.textContent = 'Dự Đoán & AI Tự Học';
         } else {
+            // NẾU LÀ USER THƯỜNG MÀ ĐANG Ở TRANG ADMIN -> CHUYỂN VỀ TRANG KHÁCH VIP
+            const currentPath = window.location.pathname.toLowerCase();
+            if (currentPath.endsWith('admin.html') || currentPath.endsWith('/admin') || currentPath.endsWith('/admin/')) {
+                window.location.href = 'index.html';
+                return;
+            }
+
             // GIAO DIỆN THÀNH VIÊN VIP (USER - CHỈ HIỆN DUY NHẤT SỔ TAY CHỐT SỐ VIP TOÀN MÀN HÌNH)
             if (btnGoToAdmin) {
                 btnGoToAdmin.classList.add('hidden');
@@ -674,10 +683,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = await res.json();
                     if (data.status === 'success' && data.token) {
                         setAuthSession({ token: data.token, user: data.user });
+                        const userRole = data.user.role || 'user';
                         showToast(`👑 Chào mừng ${data.user.full_name || data.user.username} đã đăng nhập!`, "success");
                         if (btnSubmit) {
                             btnSubmit.disabled = false;
                             btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+                        }
+                        if (userRole === 'admin' && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '')) {
+                            setTimeout(() => { window.location.href = 'admin.html'; }, 600);
+                        } else if (userRole !== 'admin' && (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/'))) {
+                            setTimeout(() => { window.location.href = 'index.html'; }, 600);
                         }
                         return;
                     }
@@ -700,6 +715,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 setAuthSession(offlineSession);
                 showToast("👑 Đã đăng nhập Quản Trị Viên (Chế độ Độc Lập)!", "success");
+                if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+                    setTimeout(() => { window.location.href = 'admin.html'; }, 600);
+                }
             } else if (username === 'loc889999' && password === 'Hoa160881') {
                 const offlineSession = {
                     token: 'offline_user_token_' + Date.now(),
@@ -707,6 +725,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 setAuthSession(offlineSession);
                 showToast("⭐ Chào mừng Khách VIP (loc889999)!", "success");
+                if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
+                    setTimeout(() => { window.location.href = 'index.html'; }, 600);
+                }
             } else {
                 showAuthError("Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!");
             }
