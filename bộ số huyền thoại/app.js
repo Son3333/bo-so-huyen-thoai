@@ -493,6 +493,10 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('bo_so_auth_session');
         } catch (e) {}
         applyAuthUIState();
+        const currentPath = window.location.pathname.toLowerCase();
+        if (currentPath.endsWith('admin.html') || currentPath.endsWith('/admin') || currentPath.endsWith('/admin/')) {
+            setTimeout(() => { window.location.href = 'index.html'; }, 300);
+        }
     }
 
     function getAuthToken() {
@@ -641,14 +645,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (btnLogoutBtn) {
-        btnLogoutBtn.addEventListener('click', () => {
-            if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
-                clearAuthSession();
-                showToast("Đã đăng xuất an toàn!", "info");
-            }
-        });
+    // Xử lý Đăng Xuất An Toàn Tức Thì
+    function handleLogoutAction(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        clearAuthSession();
+        showToast("🚪 Đã đăng xuất an toàn khỏi hệ thống!", "info");
     }
+
+    const logoutButtons = document.querySelectorAll('#btnLogoutBtn, .btn-logout-action');
+    logoutButtons.forEach(btn => {
+        btn.addEventListener('click', handleLogoutAction);
+    });
 
     if (tabAuthLoginBtn && tabAuthRegisterBtn) {
         tabAuthLoginBtn.addEventListener('click', () => {
