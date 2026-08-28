@@ -485,7 +485,18 @@ document.addEventListener('DOMContentLoaded', () => {
         lastInputData = lockedData.inputData;
         lastFullBettingSlip = lockedData.fullBettingSlip;
 
-        // Nếu lockedData chưa có predictionResult nhưng có fullBettingSlip, tự tạo cấu trúc recommendations
+        // Nếu có inputData nhưng thiếu predictionResult hoặc inputSummary, tự động tính toán
+        if (lastInputData && lastInputData.lottoNumbers && lastInputData.lottoNumbers.length > 0) {
+            const analysis = engine.analyzeHeadsTails(lastInputData.lottoNumbers);
+            if (!lastPredictionResult) {
+                lastPredictionResult = engine.predict(lastInputData.lottoNumbers, lastInputData.specialPrize, lockedData.drawDate);
+            }
+            if (lastPredictionResult) {
+                lastPredictionResult.inputSummary = analysis;
+            }
+        }
+
+        // Fallback: nếu vẫn chưa có predictionResult nhưng có fullBettingSlip, tự tạo cấu trúc recommendations
         if (!lastPredictionResult && lastFullBettingSlip) {
             const b = lastFullBettingSlip.baoLo || {};
             const d = lastFullBettingSlip.dacBiet || {};
@@ -501,7 +512,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 inputSummary: {
                     silentHeads: [],
-                    silentTails: []
+                    silentTails: [],
+                    heads: {},
+                    tails: {}
                 },
                 scores: {},
                 rankedList: []
@@ -510,7 +523,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lockedData.evalResult) {
             renderEvaluationReport(lockedData.evalResult, lockedData.learningEntry);
+        } else {
+            renderInitialEvaluationState();
         }
+
         if (lastPredictionResult) {
             renderPredictions(lastPredictionResult);
             if (lastPredictionResult.inputSummary) renderHeadTails(lastPredictionResult.inputSummary);
@@ -1044,6 +1060,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (targetId === 'tab-rules') renderRulesList();
         if (targetId === 'tab-history') renderHistoryList();
+        if (targetId === 'tab-matrix' && lastPredictionResult && lastPredictionResult.scores) renderHeatmap(lastPredictionResult.scores);
+        if (targetId === 'tab-board' && lastPredictionResult && lastPredictionResult.inputSummary) renderHeadTails(lastPredictionResult.inputSummary);
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
         // Cuộn mượt lên đầu trang khi chuyển tab trên điện thoại
@@ -1765,6 +1783,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {
                 showToast("Đã copy sổ chốt!", "info");
             });
+        });
+    }
+
+    if (btnPrintSlip) {
+        btnPrintSlip.addEventListener('click', () => {
+            window.print();
         });
     }
 
