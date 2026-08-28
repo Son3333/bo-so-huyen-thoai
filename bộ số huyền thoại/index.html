@@ -48,19 +48,36 @@
                 </div>
             </div>
 
-            <!-- Header Clock & Daily Lock Status & Cloud Sync -->
+            <!-- Header Clock & User Auth & Daily Lock Status & Cloud Sync -->
             <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- User Profile / Role Badge -->
+                <div id="userSessionContainer" class="flex items-center space-x-1.5">
+                    <button id="btnLoginTrigger" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-extrabold text-xs flex items-center space-x-1 shadow-lg shadow-amber-500/20 active:scale-95 transition">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                        <span>Đăng Nhập</span>
+                    </button>
+                    <div id="userProfileBadge" class="hidden items-center space-x-1.5">
+                        <span id="userRoleBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center space-x-1">
+                            <span id="userRoleIcon">👑</span>
+                            <span id="userFullNameText">Admin</span>
+                        </span>
+                        <button id="btnLogoutBtn" class="p-1.5 rounded-lg bg-gray-800 hover:bg-rose-950/80 border border-gray-700 hover:border-rose-500/40 text-gray-400 hover:text-rose-400 transition" title="Đăng xuất khỏi hệ thống">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <button id="btnOpenCloudModal" class="px-2.5 py-1.5 rounded-lg bg-gray-800/90 hover:bg-gray-700/90 border border-gray-700 text-xs font-semibold text-gray-300 hover:text-white flex items-center space-x-1.5 transition" title="Đồng bộ Cloud Render (Web & Điện Thoại)">
                     <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
                     <span id="cloudStatusText" class="hidden sm:inline">☁️ Cloud Live</span>
                 </button>
-                <div class="hidden sm:flex items-center px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs font-mono text-amber-300">
+                <div class="hidden lg:flex items-center px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs font-mono text-amber-300">
                     <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5 text-amber-400"></i>
                     <span id="vnLiveClock">--:--:-- (VN)</span>
                 </div>
-                <div id="dailyLockBadge" class="px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 flex items-center space-x-1.5">
+                <div id="dailyLockBadge" class="hidden sm:flex px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 items-center space-x-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span id="dailyLockStatusText">🟢 Sẵn sàng nhập</span>
+                    <span id="dailyLockStatusText">🟢 Sẵn sàng</span>
                 </div>
             </div>
         </div>
@@ -72,11 +89,11 @@
             <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2.5 text-sm font-medium">
                 <button class="nav-tab active flex items-center space-x-2 px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 border border-amber-500/30 transition whitespace-nowrap" data-target="tab-predict">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>Dự Đoán & AI Tự Học</span>
+                    <span id="navPredictTitle">Dự Đoán & Sổ Chốt VIP</span>
                 </button>
                 <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-history">
                     <i data-lucide="history" class="w-4 h-4 text-amber-400"></i>
-                    <span class="text-amber-300 font-semibold">Tra Cứu Sổ Chốt Lịch Sử</span>
+                    <span class="text-amber-300 font-semibold">Tra Cứu Lịch Sử</span>
                 </button>
                 <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-matrix">
                     <i data-lucide="grid" class="w-4 h-4"></i>
@@ -84,13 +101,13 @@
                 </button>
                 <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-board">
                     <i data-lucide="table" class="w-4 h-4"></i>
-                    <span>Bảng Đầu - Đuôi Lô Tô</span>
+                    <span>Bảng Đầu - Đuôi</span>
                 </button>
-                <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-mysql">
+                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-mysql">
                     <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i>
                     <span class="text-cyan-300">MySQL & Học Sâu</span>
                 </button>
-                <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-rules">
+                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-rules">
                     <i data-lucide="book-open" class="w-4 h-4"></i>
                     <span>Quy Tắc Bạc Nhớ</span>
                 </button>
@@ -118,6 +135,22 @@
                         <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                         <span>Xem Lại Sổ Chốt</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- VIP Member Welcome Banner (Chỉ hiện khi là User / Khách VIP) -->
+            <div id="userVipWelcomeBanner" class="hidden glass-panel rounded-2xl p-4 border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-gray-900/90 to-amber-950/30 shadow-xl space-y-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5">
+                        <span class="p-2 rounded-xl bg-amber-500/20 text-amber-400 text-lg">⭐</span>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-extrabold text-amber-300">CHÀO MỪNG THÀNH VIÊN VIP: <span id="vipUsernameText" class="text-white">loc889999</span></h3>
+                            <p class="text-xs text-gray-400">Bạn đang xem Sổ Tay Chốt Số Toàn Diện đã được Chuyên Gia & AI Master phê duyệt</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                        ● VIP ACTIVE
+                    </span>
                 </div>
             </div>
 
@@ -233,8 +266,8 @@
             <!-- Input & Quick Overview Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <!-- Left Column: Input Panel (4 Cols) -->
-                <div class="lg:col-span-4 space-y-5">
+                <!-- Left Column: Input Panel (4 Cols - Chỉ Admin được thấy & thao tác) -->
+                <div id="adminInputCol" class="admin-only-section lg:col-span-4 space-y-5">
                     <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl space-y-4">
                         <div class="flex items-center justify-between pb-3 border-b border-gray-800">
                             <div class="flex items-center space-x-2">
@@ -386,8 +419,8 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Top VIP Quick Badges (8 Cols) -->
-                <div class="lg:col-span-8 space-y-6">
+                <!-- Right Column: Top VIP Quick Badges & Full Betting Slip (8 Cols for Admin / 12 Cols for VIP User) -->
+                <div id="predictionOutputCol" class="lg:col-span-8 space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         
                         <!-- Bạch Thủ Lô VIP -->
@@ -1075,6 +1108,86 @@
             <i data-lucide="database" class="w-5 h-5 mb-0.5"></i>
             <span>Dataset</span>
         </button>
+    </div>
+
+    <!-- 🛡️ MODAL ĐĂNG NHẬP & ĐĂNG KÝ BẢO MẬT (CYBER-GOLD AUTH GATE) -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-amber-500/40 bg-gray-950/95 shadow-2xl shadow-amber-500/10 animate-modal-in space-y-5">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                <div class="flex items-center space-x-3">
+                    <img src="icon.png" alt="Logo" class="w-10 h-10 rounded-xl border border-amber-500/40 object-cover">
+                    <div>
+                        <h3 class="text-base font-extrabold bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">BỘ SỐ HUYỀN THOẠI</h3>
+                        <p class="text-[11px] text-gray-400">Hệ Thống Phân Quyền Thương Mại VIP</p>
+                    </div>
+                </div>
+                <button id="btnCloseAuthModal" class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-gray-800 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Tab Switcher: Đăng Nhập vs Đăng Ký -->
+            <div class="flex rounded-xl bg-gray-900 p-1 border border-gray-800 text-xs font-bold">
+                <button id="tabAuthLoginBtn" type="button" class="flex-1 py-2 rounded-lg bg-amber-500 text-black shadow transition">
+                    Đăng Nhập
+                </button>
+                <button id="tabAuthRegisterBtn" type="button" class="flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition">
+                    Đăng Ký Khách VIP
+                </button>
+            </div>
+
+            <!-- Form Error Box -->
+            <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-950/80 border border-rose-500/40 text-xs text-rose-300 items-start space-x-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5"></i>
+                <span id="authErrorText">Thông tin không chính xác</span>
+            </div>
+
+            <!-- Tab 1: Form Đăng Nhập -->
+            <form id="formLogin" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Tên đăng nhập (Username):</label>
+                    <input type="text" id="loginUsername" required autocomplete="username" placeholder="Nhập tài khoản (admin / loc889999...)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Mật khẩu:</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Nhập mật khẩu..." class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                        <button type="button" id="btnToggleLoginPwd" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-200">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" id="btnSubmitLogin" class="btn-gradient-primary w-full py-3 rounded-xl font-black text-black text-sm tracking-wide uppercase flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span>Đăng Nhập Hệ Thống</span>
+                </button>
+            </form>
+
+            <!-- Tab 2: Form Đăng Ký Thành Viên VIP -->
+            <form id="formRegister" class="hidden space-y-3.5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Họ & Tên / Biệt danh:</label>
+                    <input type="text" id="regFullName" placeholder="Ví dụ: Anh Lộc VIP, Phát Tài 88..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Tên đăng nhập muốn tạo:</label>
+                    <input type="text" id="regUsername" required autocomplete="username" placeholder="Chữ và số viết liền (ví dụ: khachvip1)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Mật khẩu (Ít nhất 6 ký tự):</label>
+                    <input type="password" id="regPassword" required autocomplete="new-password" placeholder="Nhập mật khẩu an toàn..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Nhập lại mật khẩu:</label>
+                    <input type="password" id="regPasswordConfirm" required autocomplete="new-password" placeholder="Xác nhận lại mật khẩu..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                </div>
+                <button type="submit" id="btnSubmitRegister" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 font-black text-black text-sm tracking-wide uppercase flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>Tạo Tài Khoản VIP</span>
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Scripts -->

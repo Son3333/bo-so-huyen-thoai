@@ -42,6 +42,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCopyFullSlip = document.getElementById('btnCopyFullSlip');
     const btnPrintSlip = document.getElementById('btnPrintSlip');
 
+    // Auth DOM Elements
+    const authModal = document.getElementById('authModal');
+    const btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
+    const btnLoginTrigger = document.getElementById('btnLoginTrigger');
+    const userProfileBadge = document.getElementById('userProfileBadge');
+    const userRoleBadge = document.getElementById('userRoleBadge');
+    const userRoleIcon = document.getElementById('userRoleIcon');
+    const userFullNameText = document.getElementById('userFullNameText');
+    const btnLogoutBtn = document.getElementById('btnLogoutBtn');
+    const tabAuthLoginBtn = document.getElementById('tabAuthLoginBtn');
+    const tabAuthRegisterBtn = document.getElementById('tabAuthRegisterBtn');
+    const formLogin = document.getElementById('formLogin');
+    const formRegister = document.getElementById('formRegister');
+    const authErrorBox = document.getElementById('authErrorBox');
+    const authErrorText = document.getElementById('authErrorText');
+    const loginUsername = document.getElementById('loginUsername');
+    const loginPassword = document.getElementById('loginPassword');
+    const btnToggleLoginPwd = document.getElementById('btnToggleLoginPwd');
+    const regFullName = document.getElementById('regFullName');
+    const regUsername = document.getElementById('regUsername');
+    const regPassword = document.getElementById('regPassword');
+    const regPasswordConfirm = document.getElementById('regPasswordConfirm');
+    const userVipWelcomeBanner = document.getElementById('userVipWelcomeBanner');
+    const vipUsernameText = document.getElementById('vipUsernameText');
+    const adminInputCol = document.getElementById('adminInputCol');
+    const predictionOutputCol = document.getElementById('predictionOutputCol');
+    const navPredictTitle = document.getElementById('navPredictTitle');
+    const adminTabBtns = document.querySelectorAll('.admin-tab-btn');
+
     // Cloud Sync Elements
     const btnOpenCloudModal = document.getElementById('btnOpenCloudModal');
     const cloudStatusDot = document.getElementById('cloudStatusDot');
@@ -395,6 +424,330 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
     }
+    // ==============================================================================
+    // 🛡️ AUTHENTICATION & ROLE-BASED ACCESS CONTROL (RBAC) CLIENT CONTROLLER
+    // ==============================================================================
+    function getAuthSession() {
+        try {
+            const s = localStorage.getItem('bo_so_auth_session');
+            if (s) return JSON.parse(s);
+        } catch (e) {}
+        return null;
+    }
+
+    function setAuthSession(session) {
+        try {
+            localStorage.setItem('bo_so_auth_session', JSON.stringify(session));
+        } catch (e) {}
+        applyAuthUIState();
+    }
+
+    function clearAuthSession() {
+        try {
+            localStorage.removeItem('bo_so_auth_session');
+        } catch (e) {}
+        applyAuthUIState();
+    }
+
+    function getAuthToken() {
+        const session = getAuthSession();
+        return session ? session.token : '';
+    }
+
+    function isCurrentUserAdmin() {
+        const session = getAuthSession();
+        return session && session.user && session.user.role === 'admin';
+    }
+
+    function showAuthError(msg) {
+        if (!authErrorBox || !authErrorText) return;
+        authErrorText.textContent = msg;
+        authErrorBox.classList.remove('hidden');
+        authErrorBox.classList.add('flex');
+    }
+
+    function hideAuthError() {
+        if (!authErrorBox) return;
+        authErrorBox.classList.add('hidden');
+        authErrorBox.classList.remove('flex');
+    }
+
+    function applyAuthUIState() {
+        const session = getAuthSession();
+
+        if (!session || !session.user) {
+            // Chưa đăng nhập: Bật modal đăng nhập bắt buộc
+            if (btnLoginTrigger) btnLoginTrigger.classList.remove('hidden');
+            if (userProfileBadge) {
+                userProfileBadge.classList.add('hidden');
+                userProfileBadge.classList.remove('flex');
+            }
+            if (adminInputCol) adminInputCol.classList.add('hidden');
+            if (predictionOutputCol) predictionOutputCol.className = 'lg:col-span-12 space-y-6';
+            if (userVipWelcomeBanner) userVipWelcomeBanner.classList.add('hidden');
+            adminTabBtns.forEach(t => t.classList.add('hidden'));
+
+            if (authModal) {
+                authModal.classList.remove('hidden');
+                authModal.classList.add('flex');
+            }
+            return;
+        }
+
+        const user = session.user;
+        const role = user.role || 'user';
+
+        if (btnLoginTrigger) btnLoginTrigger.classList.add('hidden');
+        if (userProfileBadge) {
+            userProfileBadge.classList.remove('hidden');
+            userProfileBadge.classList.add('flex');
+        }
+
+        if (authModal) {
+            authModal.classList.add('hidden');
+            authModal.classList.remove('flex');
+        }
+
+        if (role === 'admin') {
+            // GIAO DIỆN QUẢN TRỊ VIÊN ADMIN
+            if (userRoleIcon) userRoleIcon.textContent = '👑';
+            if (userFullNameText) userFullNameText.textContent = user.full_name || 'Admin';
+            if (userRoleBadge) {
+                userRoleBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center space-x-1';
+            }
+            if (adminInputCol) adminInputCol.classList.remove('hidden');
+            if (predictionOutputCol) predictionOutputCol.className = 'lg:col-span-8 space-y-6';
+            if (userVipWelcomeBanner) userVipWelcomeBanner.classList.add('hidden');
+            adminTabBtns.forEach(t => t.classList.remove('hidden'));
+            if (navPredictTitle) navPredictTitle.textContent = 'Dự Đoán & AI Tự Học';
+        } else {
+            // GIAO DIỆN THÀNH VIÊN VIP (USER)
+            if (userRoleIcon) userRoleIcon.textContent = '⭐';
+            const displayName = user.full_name || user.username;
+            if (userFullNameText) userFullNameText.textContent = displayName;
+            if (userRoleBadge) {
+                userRoleBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center space-x-1';
+            }
+            if (adminInputCol) adminInputCol.classList.add('hidden');
+            if (predictionOutputCol) predictionOutputCol.className = 'lg:col-span-12 space-y-6';
+            if (userVipWelcomeBanner) {
+                userVipWelcomeBanner.classList.remove('hidden');
+                if (vipUsernameText) vipUsernameText.textContent = `${user.username} (${displayName})`;
+            }
+            adminTabBtns.forEach(t => t.classList.add('hidden'));
+            if (navPredictTitle) navPredictTitle.textContent = 'Sổ Tay Chốt Số VIP';
+        }
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // Modal Events
+    if (btnLoginTrigger) {
+        btnLoginTrigger.addEventListener('click', () => {
+            hideAuthError();
+            if (authModal) {
+                authModal.classList.remove('hidden');
+                authModal.classList.add('flex');
+            }
+        });
+    }
+
+    if (btnCloseAuthModal) {
+        btnCloseAuthModal.addEventListener('click', () => {
+            const session = getAuthSession();
+            if (!session) {
+                showToast("Vui lòng đăng nhập hoặc tạo tài khoản để xem Sổ Tay Chốt Số!", "info");
+                return;
+            }
+            authModal.classList.add('hidden');
+            authModal.classList.remove('flex');
+        });
+    }
+
+    if (btnLogoutBtn) {
+        btnLogoutBtn.addEventListener('click', () => {
+            if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
+                clearAuthSession();
+                showToast("Đã đăng xuất an toàn!", "info");
+            }
+        });
+    }
+
+    if (tabAuthLoginBtn && tabAuthRegisterBtn) {
+        tabAuthLoginBtn.addEventListener('click', () => {
+            hideAuthError();
+            tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg bg-amber-500 text-black shadow transition';
+            tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition';
+            formLogin.classList.remove('hidden');
+            formRegister.classList.add('hidden');
+        });
+
+        tabAuthRegisterBtn.addEventListener('click', () => {
+            hideAuthError();
+            tabAuthRegisterBtn.className = 'flex-1 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow transition';
+            tabAuthLoginBtn.className = 'flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition';
+            formRegister.classList.remove('hidden');
+            formLogin.classList.add('hidden');
+        });
+    }
+
+    if (btnToggleLoginPwd && loginPassword) {
+        btnToggleLoginPwd.addEventListener('click', () => {
+            const isPwd = loginPassword.type === 'password';
+            loginPassword.type = isPwd ? 'text' : 'password';
+            btnToggleLoginPwd.innerHTML = isPwd ? '<i data-lucide="eye-off" class="w-4 h-4"></i>' : '<i data-lucide="eye" class="w-4 h-4"></i>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    }
+
+    // Xử lý Form Đăng Nhập
+    if (formLogin) {
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAuthError();
+
+            const username = loginUsername.value.trim().toLowerCase();
+            const password = loginPassword.value;
+
+            if (!username || !password) {
+                showAuthError("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btnSubmitLogin');
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang xác thực an toàn...`;
+            }
+
+            try {
+                const res = await fetch(`${getApiBase()}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                }).catch(() => null);
+
+                if (res && res.ok) {
+                    const data = await res.json();
+                    if (data.status === 'success' && data.token) {
+                        setAuthSession({ token: data.token, user: data.user });
+                        showToast(`👑 Chào mừng ${data.user.full_name || data.user.username} đã đăng nhập!`, "success");
+                        if (btnSubmit) {
+                            btnSubmit.disabled = false;
+                            btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+                        }
+                        return;
+                    }
+                } else if (res) {
+                    const data = await res.json().catch(() => ({}));
+                    showAuthError(data.message || "Tài khoản hoặc mật khẩu không chính xác!");
+                    if (btnSubmit) {
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+                    }
+                    return;
+                }
+            } catch (err) {}
+
+            // Fallback Offline Authentication nếu không thể kết nối tới server
+            if (username === 'admin' && password === 'sondeptrai2005@@@@') {
+                const offlineSession = {
+                    token: 'offline_admin_token_' + Date.now(),
+                    user: { username: 'admin', role: 'admin', full_name: 'Quản Trị Viên Tối Cao' }
+                };
+                setAuthSession(offlineSession);
+                showToast("👑 Đã đăng nhập Quản Trị Viên (Chế độ Độc Lập)!", "success");
+            } else if (username === 'loc889999' && password === 'Hoa160881') {
+                const offlineSession = {
+                    token: 'offline_user_token_' + Date.now(),
+                    user: { username: 'loc889999', role: 'user', full_name: 'Thành Viên VIP' }
+                };
+                setAuthSession(offlineSession);
+                showToast("⭐ Chào mừng Khách VIP (loc889999)!", "success");
+            } else {
+                showAuthError("Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!");
+            }
+
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Đăng Nhập Hệ Thống</span>`;
+            }
+        });
+    }
+
+    // Xử lý Form Đăng Ký
+    if (formRegister) {
+        formRegister.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAuthError();
+
+            const fullName = regFullName.value.trim();
+            const username = regUsername.value.trim().toLowerCase();
+            const password = regPassword.value;
+            const confirm = regPasswordConfirm.value;
+
+            if (password !== confirm) {
+                showAuthError("Mật khẩu xác nhận không trùng khớp!");
+                return;
+            }
+
+            if (password.length < 6) {
+                showAuthError("Mật khẩu phải có ít nhất 6 ký tự!");
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btnSubmitRegister');
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang tạo tài khoản...`;
+            }
+
+            try {
+                const res = await fetch(`${getApiBase()}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, full_name: fullName })
+                }).catch(() => null);
+
+                if (res && (res.status === 200 || res.status === 201)) {
+                    const data = await res.json();
+                    if (data.status === 'success' && data.token) {
+                        setAuthSession({ token: data.token, user: data.user });
+                        showToast(`🎉 Đăng ký thành công! Chào mừng thành viên VIP ${data.user.full_name || data.user.username}!`, "success");
+                        if (btnSubmit) {
+                            btnSubmit.disabled = false;
+                            btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
+                        }
+                        return;
+                    }
+                } else if (res) {
+                    const data = await res.json().catch(() => ({}));
+                    showAuthError(data.message || "Không thể tạo tài khoản. Tên đăng nhập có thể đã tồn tại!");
+                    if (btnSubmit) {
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
+                    }
+                    return;
+                }
+            } catch (err) {}
+
+            // Fallback tạo local user nếu không kết nối được server
+            const offlineSession = {
+                token: 'offline_user_token_' + Date.now(),
+                user: { username, role: 'user', full_name: fullName || username }
+            };
+            setAuthSession(offlineSession);
+            showToast(`🎉 Đã tạo tài khoản thành viên VIP ${username}!`, "success");
+
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
+            }
+        });
+    }
+
+    // Khởi tạo trạng thái xác thực khi tải trang
+    applyAuthUIState();
 
     // --- MOBILE DETECTION & ADAPTIVE LAYOUT ---
     function detectMobileAndApplyLayout() {
@@ -861,12 +1214,18 @@ document.addEventListener('DOMContentLoaded', () => {
             endpoints.push(`${cloudUrl}/api/save-draw`);
         }
 
+        const token = getAuthToken();
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        };
+
         let sentSuccess = false;
         for (const ep of endpoints) {
             try {
                 const res = await fetch(ep, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers,
                     body: JSON.stringify(payload)
                 }).catch(() => null);
 
@@ -1512,9 +1871,15 @@ document.addEventListener('DOMContentLoaded', () => {
             lotto_numbers: lastInputData.lottoNumbers
         };
 
+        const token = getAuthToken();
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        };
+
         fetch(`${getApiBase()}/save-draw`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(payload)
         }).then(res => res.json())
           .then(data => {

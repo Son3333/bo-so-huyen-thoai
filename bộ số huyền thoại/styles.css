@@ -349,3 +349,18 @@ body {
 .is-mobile .mobile-full-width {
     width: 100% !important;
 }
+
+/* ===================================================
+   AUTHENTICATION & ROLE BADGE CYBER STYLING
+   =================================================== */
+.admin-tab-btn.hidden {
+    display: none !important;
+}
+
+.admin-only-section.hidden {
+    display: none !important;
+}
+
+.auth-input-glow:focus {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
