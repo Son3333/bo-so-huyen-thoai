@@ -292,10 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateQuickHistorySelect() {
         if (!quickHistorySelect) return;
         const lockedDays = getLockedDays();
-        const dates = Object.keys(lockedDays).sort().reverse();
+        const history = getHistory();
+        const canonicalDays = (typeof CANONICAL_INITIAL_DATA !== 'undefined' && CANONICAL_INITIAL_DATA.lockedDays) ? Object.keys(CANONICAL_INITIAL_DATA.lockedDays) : [];
+        const allDates = Array.from(new Set([...Object.keys(lockedDays), ...history.map(h => h.date), ...canonicalDays])).filter(Boolean).sort().reverse();
 
         quickHistorySelect.innerHTML = '<option value="">-- Chọn ngày đã chốt để xem lại --</option>';
-        dates.forEach(d => {
+        allDates.forEach(d => {
             const opt = document.createElement('option');
             opt.value = d;
             opt.textContent = `Kỳ ngày: ${d} (Đã chốt đầy đủ)`;
@@ -307,20 +309,19 @@ document.addEventListener('DOMContentLoaded', () => {
         btnViewSelectedHistory.addEventListener('click', () => {
             const chosen = quickHistorySelect ? quickHistorySelect.value : '';
             if (!chosen) {
-                showToast("Vui lòng chọn 1 ngày trong danh sách!");
+                showToast("Vui lòng chọn 1 ngày trong danh sách!", "warning");
                 return;
             }
-            if (inputDrawDate) inputDrawDate.value = chosen;
-            checkDailyLockStatus();
-            showToast(`📂 Đã mở lại Sổ Tay Chốt Số ngày ${chosen}!`);
+            if (typeof window.viewHistoricalDay === 'function') {
+                window.viewHistoricalDay(chosen);
+            }
         });
     }
 
     if (quickHistorySelect) {
         quickHistorySelect.addEventListener('change', () => {
-            if (quickHistorySelect.value) {
-                if (inputDrawDate) inputDrawDate.value = quickHistorySelect.value;
-                checkDailyLockStatus();
+            if (quickHistorySelect.value && typeof window.viewHistoricalDay === 'function') {
+                window.viewHistoricalDay(quickHistorySelect.value);
             }
         });
     }
@@ -361,8 +362,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkDailyLockStatus() {
         const selectedDate = (inputDrawDate && inputDrawDate.value) ? inputDrawDate.value : todayVN;
-        const lockedDays = getLockedDays();
-        const lockedData = lockedDays[selectedDate];
+        let lockedDays = getLockedDays();
+        let lockedData = lockedDays[selectedDate];
+
+        if (!lockedData) {
+            // Phục hồi từ CANONICAL_INITIAL_DATA nếu có
+            if (typeof CANONICAL_INITIAL_DATA !== 'undefined' && CANONICAL_INITIAL_DATA.lockedDays && CANONICAL_INITIAL_DATA.lockedDays[selectedDate]) {
+                lockedData = CANONICAL_INITIAL_DATA.lockedDays[selectedDate];
+                saveLockedDay(selectedDate, lockedData);
+            } else {
+                // Phục hồi từ History nếu có
+                const history = getHistory();
+                const hist = history.find(h => h.date === selectedDate);
+                if (hist && (hist.fullBettingSlip || hist.recommendations)) {
+                    lockedData = {
+                        drawDate: selectedDate,
+                        inputData: {
+                            date: selectedDate,
+                            specialPrize: hist.specialPrize || '',
+                            prize1: hist.prize1 || '',
+                            rawPrizes: hist.rawPrizes || {},
+                            lottoNumbers: hist.inputNumbers || []
+                        },
+                        predictionResult: {
+                            recommendations: hist.recommendations || {
+                                bachThu: (hist.fullBettingSlip && hist.fullBettingSlip.baoLo && hist.fullBettingSlip.baoLo.btl) || '34',
+                                songThu: (hist.fullBettingSlip && hist.fullBettingSlip.baoLo && hist.fullBettingSlip.baoLo.stl) || ['34', '43']
+                            },
+                            fullBettingSlip: hist.fullBettingSlip
+                        },
+                        fullBettingSlip: hist.fullBettingSlip,
+                        lockedAt: new Date().toISOString()
+                    };
+                    saveLockedDay(selectedDate, lockedData);
+                }
+            }
+        }
 
         if (lockedData) {
             if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
@@ -371,6 +406,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btnRunText) btnRunText.textContent = 'Xem Lại Bản Chốt Cố Định';
 
             renderLockedPrediction(lockedData);
+
+            // Điền lại input
+            if (lockedData.inputData) {
+                if (quickInputText && lockedData.inputData.lottoNumbers && lockedData.inputData.lottoNumbers.length > 0) {
+                    quickInputText.value = lockedData.inputData.lottoNumbers.join(' ');
+                    if (quickCountBadge) quickCountBadge.textContent = `Đã nhận: ${lockedData.inputData.lottoNumbers.length} số`;
+                }
+                if (lockedData.inputData.rawPrizes && fullBoardContainer) {
+                    Object.keys(lockedData.inputData.rawPrizes).forEach(k => {
+                        const inputEl = document.getElementById(`g_${k}`);
+                        if (inputEl) inputEl.value = lockedData.inputData.rawPrizes[k];
+                    });
+                }
+            }
         } else {
             const latestLocked = getLatestLockedDay();
             const isIndexPage = !document.getElementById('adminInputCol');
@@ -2456,19 +2505,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Window helper functions for history actions
     window.viewHistoricalDay = function(dateStr) {
-        if (inputDrawDate) inputDrawDate.value = dateStr;
-        checkDailyLockStatus();
-        
-        // Switch to Tab 1
-        const tabPredictBtn = document.querySelector('button[data-target="tab-predict"]');
-        if (tabPredictBtn) tabPredictBtn.click();
-        
-        // Scroll to full betting slip
-        const slipSection = document.getElementById('fullBettingSlipSection');
-        if (slipSection) {
-            slipSection.scrollIntoView({ behavior: 'smooth' });
+        if (!dateStr) return;
+        const lockedDays = getLockedDays();
+        const history = getHistory();
+        let targetData = lockedDays[dateStr];
+
+        if (!targetData) {
+            const hist = history.find(h => h.date === dateStr);
+            if (hist && (hist.fullBettingSlip || hist.recommendations)) {
+                targetData = {
+                    drawDate: dateStr,
+                    inputData: {
+                        date: dateStr,
+                        specialPrize: hist.specialPrize || '',
+                        prize1: hist.prize1 || '',
+                        rawPrizes: hist.rawPrizes || {},
+                        lottoNumbers: hist.inputNumbers || []
+                    },
+                    predictionResult: {
+                        recommendations: hist.recommendations || {
+                            bachThu: (hist.fullBettingSlip && hist.fullBettingSlip.baoLo && hist.fullBettingSlip.baoLo.btl) || '34',
+                            songThu: (hist.fullBettingSlip && hist.fullBettingSlip.baoLo && hist.fullBettingSlip.baoLo.stl) || ['34', '43']
+                        },
+                        fullBettingSlip: hist.fullBettingSlip
+                    },
+                    fullBettingSlip: hist.fullBettingSlip,
+                    lockedAt: new Date().toISOString()
+                };
+                saveLockedDay(dateStr, targetData);
+            } else if (typeof CANONICAL_INITIAL_DATA !== 'undefined' && CANONICAL_INITIAL_DATA.lockedDays && CANONICAL_INITIAL_DATA.lockedDays[dateStr]) {
+                targetData = CANONICAL_INITIAL_DATA.lockedDays[dateStr];
+                saveLockedDay(dateStr, targetData);
+            }
         }
-        showToast(`📂 Đã mở trọn vẹn Sổ Tay Chốt Số ngày ${dateStr}!`);
+
+        if (inputDrawDate) {
+            inputDrawDate.value = dateStr;
+            updateTargetPlayDateDisplay();
+        }
+
+        if (targetData) {
+            renderLockedPrediction(targetData);
+            if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
+            if (dailyLockStatusText) dailyLockStatusText.textContent = `🔒 Đã Chốt Ngày ${dateStr}`;
+            if (drawDateTag) drawDateTag.textContent = '🔒 Đã Chốt Số Cố Định';
+            if (btnRunText) btnRunText.textContent = 'Xem Lại Bản Chốt Cố Định';
+
+            // Điền lại input
+            if (targetData.inputData) {
+                if (quickInputText && targetData.inputData.lottoNumbers && targetData.inputData.lottoNumbers.length > 0) {
+                    quickInputText.value = targetData.inputData.lottoNumbers.join(' ');
+                    if (quickCountBadge) quickCountBadge.textContent = `Đã nhận: ${targetData.inputData.lottoNumbers.length} số`;
+                }
+                if (targetData.inputData.rawPrizes && fullBoardContainer) {
+                    Object.keys(targetData.inputData.rawPrizes).forEach(k => {
+                        const inputEl = document.getElementById(`g_${k}`);
+                        if (inputEl) inputEl.value = targetData.inputData.rawPrizes[k];
+                    });
+                }
+            }
+        } else {
+            checkDailyLockStatus();
+        }
+
+        // Chuyển tab sang tab-predict
+        if (typeof switchTab === 'function') {
+            switchTab('tab-predict');
+        } else {
+            const tabPredictBtn = document.querySelector('button[data-target="tab-predict"]');
+            if (tabPredictBtn) tabPredictBtn.click();
+        }
+
+        // Cuộn xuống Sổ Tay Chốt Số
+        setTimeout(() => {
+            const slipSection = document.getElementById('fullBettingSlipSection');
+            if (slipSection) {
+                slipSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 150);
+
+        showToast(`📂 Đã mở trọn vẹn Sổ Tay Chốt Số ngày ${dateStr}!`, "success");
     };
 
     window.copyHistoricalDay = function(dateStr) {
