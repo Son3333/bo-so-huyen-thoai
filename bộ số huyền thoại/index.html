@@ -48,8 +48,12 @@
                 </div>
             </div>
 
-            <!-- Header Clock & Daily Lock Status -->
+            <!-- Header Clock & Daily Lock Status & Cloud Sync -->
             <div class="flex items-center space-x-2 sm:space-x-3">
+                <button id="btnOpenCloudModal" class="px-2.5 py-1.5 rounded-lg bg-gray-800/90 hover:bg-gray-700/90 border border-gray-700 text-xs font-semibold text-gray-300 hover:text-white flex items-center space-x-1.5 transition" title="Đồng bộ Cloud Render (Web & Điện Thoại)">
+                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span id="cloudStatusText" class="hidden sm:inline">☁️ Cloud Live</span>
+                </button>
                 <div class="hidden sm:flex items-center px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs font-mono text-amber-300">
                     <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5 text-amber-400"></i>
                     <span id="vnLiveClock">--:--:-- (VN)</span>
@@ -993,6 +997,51 @@
                 </button>
                 <button id="btnCyberConfirmOk" class="py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold text-xs transition shadow-lg">
                     Đồng Ý
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ☁️ MODAL CẤU HÌNH & ĐỒNG BỘ MÁY CHỦ CLOUD (RENDER / WEB / ĐIỆN THOẠI) -->
+    <div id="cloudConfigModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-cyan-500/40 bg-gray-900 shadow-2xl space-y-4 animate-modal-in">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">☁️</span>
+                    <div>
+                        <h3 class="font-bold text-gray-100 text-base">Đồng Bộ Cloud Render (Web & App)</h3>
+                        <p class="text-[11px] text-gray-400">Kết nối App Desktop với Máy chủ Cloud để tự động cập nhật số</p>
+                    </div>
+                </div>
+                <button id="btnCloseCloudModal" class="p-1.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <p class="text-gray-300 leading-relaxed">
+                    Khi bạn cào số hoặc lưu trên <strong>Điện Thoại / Web</strong>, máy chủ Cloud sẽ ghi nhận. App Desktop sẽ tự động kéo dữ liệu về để khớp nhau 100%.
+                </p>
+
+                <div class="space-y-1">
+                    <label class="block text-gray-400 font-semibold">Địa chỉ Máy Chủ Cloud Render:</label>
+                    <input type="text" id="inputCloudServerUrl" placeholder="https://bo-so-huyen-thoai-master.onrender.com" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500">
+                </div>
+
+                <div id="cloudPingResult" class="p-3 rounded-xl bg-gray-950/80 border border-gray-800 text-[11px] text-gray-400 space-y-1">
+                    <div>Trạng thái kết nối: <span id="cloudPingText" class="font-bold text-emerald-400">Đang kiểm tra...</span></div>
+                    <div id="cloudServerTimeText" class="text-gray-500 text-[10px]">Thời gian máy chủ: --</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button id="btnTestAndSaveCloud" class="py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition flex items-center justify-center space-x-1.5 shadow-lg shadow-cyan-600/20">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Lưu & Kết Nối</span>
+                </button>
+                <button id="btnSyncNowCloud" class="py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold text-xs transition flex items-center justify-center space-x-1.5 shadow-lg shadow-amber-500/20">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <span>Đồng Bộ Ngay</span>
                 </button>
             </div>
         </div>

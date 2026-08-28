@@ -10,9 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastPredictionResult = null;
     let lastInputData = null;
     let lastFullBettingSlip = null;
-    const API_BASE = (window.location.protocol.startsWith('http')) 
-        ? `${window.location.origin}/api` 
-        : 'http://localhost:8080/api';
+
+    function getCloudServerUrl() {
+        return (localStorage.getItem('bo_so_cloud_server_url') || 'https://bo-so-huyen-thoai-master.onrender.com').trim().replace(/\/+$/, '');
+    }
+
+    function getApiBase() {
+        if (window.location.protocol.startsWith('http') && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
+            return `${window.location.origin}/api`;
+        }
+        const cloud = getCloudServerUrl();
+        if (cloud) return `${cloud}/api`;
+        return 'http://localhost:8080/api';
+    }
 
     // --- DOM ELEMENTS ---
     const vnLiveClock = document.getElementById('vnLiveClock');
@@ -31,6 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClearInput = document.getElementById('btnClearInput');
     const btnCopyFullSlip = document.getElementById('btnCopyFullSlip');
     const btnPrintSlip = document.getElementById('btnPrintSlip');
+
+    // Cloud Sync Elements
+    const btnOpenCloudModal = document.getElementById('btnOpenCloudModal');
+    const cloudStatusDot = document.getElementById('cloudStatusDot');
+    const cloudStatusText = document.getElementById('cloudStatusText');
+    const cloudConfigModal = document.getElementById('cloudConfigModal');
+    const btnCloseCloudModal = document.getElementById('btnCloseCloudModal');
+    const inputCloudServerUrl = document.getElementById('inputCloudServerUrl');
+    const cloudPingText = document.getElementById('cloudPingText');
+    const cloudServerTimeText = document.getElementById('cloudServerTimeText');
+    const btnTestAndSaveCloud = document.getElementById('btnTestAndSaveCloud');
+    const btnSyncNowCloud = document.getElementById('btnSyncNowCloud');
 
     // Quick History Selector
     const quickHistorySelect = document.getElementById('quickHistorySelect');
@@ -136,12 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
         inputDrawDate.value = todayVN;
         inputDrawDate.addEventListener('change', () => {
             checkDailyLockStatus();
+            syncCanonicalSlipFromCloud(inputDrawDate.value);
         });
     }
 
     updateWeightDisplay();
     populateQuickHistorySelect();
     checkDailyLockStatus();
+    initCloudStatusUI();
+    syncCanonicalSlipFromCloud(todayVN);
 
     function syncInitialCanonicalData() {
         if (typeof CANONICAL_INITIAL_DATA !== 'undefined' && CANONICAL_INITIAL_DATA.lockedDays) {
@@ -469,6 +494,132 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
+    function parseXSMBHTML(html) {
+        if (!html) return null;
+        function extract(pattern) {
+            const m = html.match(new RegExp(pattern));
+            return m ? m[1].trim() : '';
+        }
+        const gdb = extract('class="v-gdb\\s*">([^<]+)<');
+        if (!gdb || gdb.length < 5) return null;
+
+        const rawPrizes = {
+            gdb: gdb,
+            g1: extract('class="v-g1\\s*">([^<]+)<'),
+            g2_1: extract('class="v-g2-0\\s*">([^<]+)<'),
+            g2_2: extract('class="v-g2-1\\s*">([^<]+)<'),
+            g3_1: extract('class="v-g3-0\\s*">([^<]+)<'),
+            g3_2: extract('class="v-g3-1\\s*">([^<]+)<'),
+            g3_3: extract('class="v-g3-2\\s*">([^<]+)<'),
+            g3_4: extract('class="v-g3-3\\s*">([^<]+)<'),
+            g3_5: extract('class="v-g3-4\\s*">([^<]+)<'),
+            g3_6: extract('class="v-g3-5\\s*">([^<]+)<'),
+            g4_1: extract('class="v-g4-0\\s*">([^<]+)<'),
+            g4_2: extract('class="v-g4-1\\s*">([^<]+)<'),
+            g4_3: extract('class="v-g4-2\\s*">([^<]+)<'),
+            g4_4: extract('class="v-g4-3\\s*">([^<]+)<'),
+            g5_1: extract('class="v-g5-0\\s*">([^<]+)<'),
+            g5_2: extract('class="v-g5-1\\s*">([^<]+)<'),
+            g5_3: extract('class="v-g5-2\\s*">([^<]+)<'),
+            g5_4: extract('class="v-g5-3\\s*">([^<]+)<'),
+            g5_5: extract('class="v-g5-4\\s*">([^<]+)<'),
+            g5_6: extract('class="v-g5-5\\s*">([^<]+)<'),
+            g6_1: extract('class="v-g6-0\\s*">([^<]+)<'),
+            g6_2: extract('class="v-g6-1\\s*">([^<]+)<'),
+            g6_3: extract('class="v-g6-2\\s*">([^<]+)<'),
+            g7_1: extract('class="v-g7-0\\s*">([^<]+)<'),
+            g7_2: extract('class="v-g7-1\\s*">([^<]+)<'),
+            g7_3: extract('class="v-g7-2\\s*">([^<]+)<'),
+            g7_4: extract('class="v-g7-3\\s*">([^<]+)<')
+        };
+
+        const orderedKeys = ['gdb', 'g1', 'g2_1', 'g2_2', 'g3_1', 'g3_2', 'g3_3', 'g3_4', 'g3_5', 'g3_6',
+                            'g4_1', 'g4_2', 'g4_3', 'g4_4', 'g5_1', 'g5_2', 'g5_3', 'g5_4', 'g5_5', 'g5_6',
+                            'g6_1', 'g6_2', 'g6_3', 'g7_1', 'g7_2', 'g7_3', 'g7_4'];
+        const lottoNumbers = [];
+        for (const k of orderedKeys) {
+            const val = String(rawPrizes[k] || '').trim();
+            if (val.length >= 2) {
+                lottoNumbers.push(val.slice(-2));
+            }
+        }
+
+        if (lottoNumbers.length >= 27) {
+            return { rawPrizes, lottoNumbers };
+        }
+        return null;
+    }
+
+    async function fetchLiveLotteryPrizes(selectedDate) {
+        // 1. Thử qua API Server chính (Cloud hoặc Local)
+        const primaryApi = `${getApiBase()}/latest-draw?date=${selectedDate}`;
+        try {
+            const res = await fetch(primaryApi, { cache: 'no-cache' }).catch(() => null);
+            if (res && res.ok) {
+                const data = await res.json();
+                if (data && data.raw_prizes && Object.keys(data.raw_prizes).length >= 27) {
+                    return { rawPrizes: data.raw_prizes, lottoNumbers: data.lotto_numbers, source: 'primary_api' };
+                }
+            }
+        } catch (e) {}
+
+        // 2. Thử Cloud Render URL nếu đang chạy Desktop App (file:// hoặc localhost)
+        const cloudUrl = getCloudServerUrl();
+        if (cloudUrl && !primaryApi.startsWith(cloudUrl)) {
+            try {
+                const res = await fetch(`${cloudUrl}/api/latest-draw?date=${selectedDate}`, { cache: 'no-cache' }).catch(() => null);
+                if (res && res.ok) {
+                    const data = await res.json();
+                    if (data && data.raw_prizes && Object.keys(data.raw_prizes).length >= 27) {
+                        return { rawPrizes: data.raw_prizes, lottoNumbers: data.lotto_numbers, source: 'cloud_render' };
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 3. Thử qua Localhost:8080 nếu API chính là Cloud
+        if (!primaryApi.includes('localhost:8080')) {
+            try {
+                const res = await fetch(`http://localhost:8080/api/latest-draw?date=${selectedDate}`).catch(() => null);
+                if (res && res.ok) {
+                    const data = await res.json();
+                    if (data && data.raw_prizes && Object.keys(data.raw_prizes).length >= 27) {
+                        return { rawPrizes: data.raw_prizes, lottoNumbers: data.lotto_numbers, source: 'localhost' };
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 4. Thử Cào Trực Tiếp qua các cổng CORS Proxy mở tốc độ cao
+        const proxyUrls = [
+            'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://xsmb.me'),
+            'https://corsproxy.io/?' + encodeURIComponent('https://xsmb.me'),
+            'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent('https://xsmb.me')
+        ];
+
+        for (const pUrl of proxyUrls) {
+            try {
+                const res = await fetch(pUrl).catch(() => null);
+                if (res && res.ok) {
+                    const html = await res.text();
+                    const parsed = parseXSMBHTML(html);
+                    if (parsed) {
+                        return { rawPrizes: parsed.rawPrizes, lottoNumbers: parsed.lottoNumbers, source: 'direct_cors_scraper' };
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 5. Fallback tầng 5: Kho lưu trữ Master hoặc Lịch sử chuẩn
+        const history = getHistory();
+        const hist = history.find(h => h.date === selectedDate);
+        if (hist && hist.rawPrizes) {
+            return { rawPrizes: hist.rawPrizes, lottoNumbers: hist.lottoNumbers, source: 'storage_cache' };
+        }
+
+        return null;
+    }
+
     const btnAutoFetchOnline = document.getElementById('btnAutoFetchOnline');
     if (btnAutoFetchOnline) {
         btnAutoFetchOnline.addEventListener('click', async () => {
@@ -482,30 +633,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             showToast("🌐 Đang kết nối máy chủ cào kết quả XSMB trực tuyến...", "info");
 
-            try {
-                // Thử cào qua API Server (Local hoặc Render Cloud)
-                let res = await fetch(`${API_BASE}/latest-draw?date=${selectedDate}`).catch(() => null);
-                
-                if (res && res.ok) {
-                    const data = await res.json();
-                    if (data && data.raw_prizes) {
-                        applyOnlinePrizes(data.raw_prizes, data.lotto_numbers);
-                        runPrediction();
-                        showToast(`✅ Đã tự động cào đủ 27 giải và AI đã chốt số ngày ${selectedDate}!`, "success");
-                        return;
-                    }
-                }
-
-                // Fallback tầng 2: Kho lưu trữ Master hoặc Lịch sử chuẩn
-                const history = getHistory();
-                const hist = history.find(h => h.date === selectedDate);
-                if (hist && hist.rawPrizes) {
-                    applyOnlinePrizes(hist.rawPrizes, hist.lottoNumbers);
-                    runPrediction();
-                    showToast(`⚡ Đã tải kết quả 27 giải ngày ${selectedDate} và AI đã chốt số!`, "success");
-                    return;
-                }
-            } catch (e) {}
+            const fetched = await fetchLiveLotteryPrizes(selectedDate);
+            if (fetched && fetched.rawPrizes) {
+                applyOnlinePrizes(fetched.rawPrizes, fetched.lottoNumbers);
+                runPrediction();
+                showToast(`✅ Đã tự động cào đủ 27 giải và AI đã chốt số ngày ${selectedDate}!`, "success");
+                return;
+            }
 
             showToast("Chưa thể kết nối tới nguồn cào trực tiếp lúc này. Bạn vui lòng thử lại hoặc dán kết quả 27 giải vào ô nhập.", "warning");
         });
@@ -648,25 +782,165 @@ document.addEventListener('DOMContentLoaded', () => {
             full_betting_slip: fullSlip
         };
 
-        try {
-            const res = await fetch(`${API_BASE}/save-draw`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        const endpoints = [];
+        const primaryApi = `${getApiBase()}/save-draw`;
+        endpoints.push(primaryApi);
 
-            if (res && res.ok) {
-                showToast("🤖 Đã tự động bắn Sổ Tay Chốt Số VIP vào nhóm Telegram!", "success");
-            } else {
-                fetch(`${API_BASE}/broadcast-telegram`, {
+        const cloudUrl = getCloudServerUrl();
+        if (cloudUrl && !primaryApi.startsWith(cloudUrl)) {
+            endpoints.push(`${cloudUrl}/api/save-draw`);
+        }
+
+        let sentSuccess = false;
+        for (const ep of endpoints) {
+            try {
+                const res = await fetch(ep, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ slip: fullSlip })
-                });
-            }
-        } catch (e) {
-            console.warn("Không thể kết nối Master Server API:", e);
+                    body: JSON.stringify(payload)
+                }).catch(() => null);
+
+                if (res && res.ok) {
+                    sentSuccess = true;
+                }
+            } catch (e) {}
         }
+
+        if (sentSuccess) {
+            showToast("🤖 Đã tự động bắn Sổ Tay Chốt Số VIP vào nhóm Telegram!", "success");
+        }
+    }
+
+    async function syncCanonicalSlipFromCloud(selectedDate) {
+        const targets = [];
+        const primaryApi = `${getApiBase()}/canonical-slip?date=${selectedDate}`;
+        targets.push(primaryApi);
+
+        const cloudUrl = getCloudServerUrl();
+        if (cloudUrl && !primaryApi.startsWith(cloudUrl)) {
+            targets.push(`${cloudUrl}/api/canonical-slip?date=${selectedDate}`);
+        }
+
+        for (const url of targets) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' }).catch(() => null);
+                if (res && res.ok) {
+                    const json = await res.json();
+                    if (json && json.data && json.data.full_betting_slip) {
+                        const lockedDays = getLockedDays();
+                        const currentLocked = lockedDays[selectedDate];
+
+                        const canonData = {
+                            drawDate: selectedDate,
+                            inputData: {
+                                date: selectedDate,
+                                lottoNumbers: json.data.lotto_numbers || [],
+                                specialPrize: json.data.special_prize || '',
+                                prize1: json.data.prize_1 || '',
+                                rawPrizes: json.data.raw_prizes || {}
+                            },
+                            predictionResult: {
+                                recommendations: {
+                                    bachThu: json.data.full_betting_slip.baoLo.btl,
+                                    songThu: json.data.full_betting_slip.baoLo.stl,
+                                    dan4: json.data.full_betting_slip.baoLo.dan4,
+                                    chamDe: json.data.full_betting_slip.dacBiet.chamDe
+                                },
+                                fullBettingSlip: json.data.full_betting_slip
+                            },
+                            fullBettingSlip: json.data.full_betting_slip,
+                            lockedAt: new Date().toISOString()
+                        };
+
+                        if (!currentLocked || JSON.stringify(currentLocked.fullBettingSlip) !== JSON.stringify(canonData.fullBettingSlip)) {
+                            saveLockedDay(selectedDate, canonData);
+                            if (inputDrawDate && inputDrawDate.value === selectedDate) {
+                                renderLockedPrediction(canonData);
+                                showToast(`☁️ Đã tự động đồng bộ Sổ Chốt ngày ${selectedDate} từ Cloud!`, "info");
+                            }
+                            return true;
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+        return false;
+    }
+
+    function initCloudStatusUI() {
+        if (inputCloudServerUrl) {
+            inputCloudServerUrl.value = getCloudServerUrl();
+        }
+        testCloudConnection(false);
+    }
+
+    async function testCloudConnection(showFeedback = false) {
+        const cloudUrl = getCloudServerUrl();
+        if (cloudPingText) cloudPingText.textContent = "Đang kiểm tra...";
+        
+        try {
+            const res = await fetch(`${cloudUrl}/api/status`, { cache: 'no-cache' }).catch(() => null);
+            if (res && res.ok) {
+                const data = await res.json();
+                if (cloudStatusDot) cloudStatusDot.className = "w-2 h-2 rounded-full bg-emerald-400";
+                if (cloudStatusText) cloudStatusText.textContent = "☁️ Cloud Live";
+                if (cloudPingText) cloudPingText.innerHTML = `<span class="text-emerald-400 font-bold">🟢 Kết nối Tốt (${data.service || 'Render Master'})</span>`;
+                if (cloudServerTimeText) cloudServerTimeText.textContent = `Giờ máy chủ: ${data.server_time_vn || '--'}`;
+                if (showFeedback) showToast("🟢 Kết nối Máy chủ Cloud thành công!", "success");
+                return true;
+            }
+        } catch (e) {}
+
+        if (cloudStatusDot) cloudStatusDot.className = "w-2 h-2 rounded-full bg-amber-400";
+        if (cloudStatusText) cloudStatusText.textContent = "☁️ Cào Trực Tuyến";
+        if (cloudPingText) cloudPingText.innerHTML = `<span class="text-amber-400 font-semibold">🟡 Cào trực tiếp từ mạng (Đã kích hoạt)</span>`;
+        if (showFeedback) showToast("Đã kích hoạt chế độ cào mạng trực tiếp!", "info");
+        return false;
+    }
+
+    if (btnOpenCloudModal) {
+        btnOpenCloudModal.addEventListener('click', () => {
+            if (inputCloudServerUrl) inputCloudServerUrl.value = getCloudServerUrl();
+            testCloudConnection(false);
+            if (cloudConfigModal) {
+                cloudConfigModal.classList.remove('hidden');
+                cloudConfigModal.classList.add('flex');
+            }
+        });
+    }
+
+    if (btnCloseCloudModal) {
+        btnCloseCloudModal.addEventListener('click', () => {
+            if (cloudConfigModal) {
+                cloudConfigModal.classList.add('hidden');
+                cloudConfigModal.classList.remove('flex');
+            }
+        });
+    }
+
+    if (btnTestAndSaveCloud) {
+        btnTestAndSaveCloud.addEventListener('click', async () => {
+            const val = (inputCloudServerUrl.value || '').trim();
+            if (val) {
+                localStorage.setItem('bo_so_cloud_server_url', val);
+            }
+            await testCloudConnection(true);
+            const curDate = inputDrawDate.value || todayVN;
+            syncCanonicalSlipFromCloud(curDate);
+        });
+    }
+
+    if (btnSyncNowCloud) {
+        btnSyncNowCloud.addEventListener('click', async () => {
+            const curDate = inputDrawDate.value || todayVN;
+            showToast("🔄 Đang đồng bộ dữ liệu từ Cloud...", "info");
+            const synced = await syncCanonicalSlipFromCloud(curDate);
+            if (synced) {
+                showToast(`✅ Đã đồng bộ thành công ngày ${curDate} từ Cloud!`, "success");
+            } else {
+                showToast("Dữ liệu trên máy và Cloud đã đồng nhất!", "info");
+            }
+        });
     }
 
     // --- RENDER FULL BETTING SLIP ---
