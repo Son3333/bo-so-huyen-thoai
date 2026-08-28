@@ -827,69 +827,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Xử lý Form Đăng Ký
-    if (formRegister) {
-        formRegister.addEventListener('submit', async (e) => {
+    async function executeRegisterFlow(e) {
+        if (e) {
             e.preventDefault();
-            hideAuthError();
+        }
+        hideAuthError();
 
-            const fullName = regFullName ? regFullName.value.trim() : '';
-            const username = regUsername ? regUsername.value.trim().toLowerCase() : '';
-            const password = regPassword ? regPassword.value : '';
-            const confirm = regPasswordConfirm ? regPasswordConfirm.value : '';
+        const fullName = regFullName ? regFullName.value.trim() : '';
+        const username = regUsername ? regUsername.value.trim().toLowerCase() : '';
+        const password = regPassword ? regPassword.value : '';
+        const confirm = regPasswordConfirm ? regPasswordConfirm.value : '';
 
-            if (!username || !password) {
-                showAuthError("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
-                return;
-            }
+        if (!username || !password) {
+            showAuthError("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
+            return;
+        }
 
-            if (password !== confirm) {
-                showAuthError("Mật khẩu xác nhận không trùng khớp!");
-                return;
-            }
+        if (password !== confirm) {
+            showAuthError("Mật khẩu xác nhận không trùng khớp!");
+            return;
+        }
 
-            if (password.length < 6) {
-                showAuthError("Mật khẩu phải có ít nhất 6 ký tự!");
-                return;
-            }
+        if (password.length < 6) {
+            showAuthError("Mật khẩu phải có ít nhất 6 ký tự!");
+            return;
+        }
 
-            const btnSubmit = document.getElementById('btnSubmitRegister');
-            if (btnSubmit) {
-                btnSubmit.disabled = true;
-                btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang tạo tài khoản...`;
-            }
+        const btnSubmit = document.getElementById('btnSubmitRegister');
+        if (btnSubmit) {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="animate-spin mr-2">🔄</span> Đang tạo tài khoản...`;
+        }
 
-            // Lưu tài khoản cục bộ tức thì
-            saveRegisteredLocalUser(username, {
-                username: username,
-                password: password,
-                role: 'user',
-                full_name: fullName || username,
-                created_at: new Date().toISOString()
-            });
-
-            const session = {
-                token: 'user_reg_token_' + Date.now(),
-                user: { username, role: 'user', full_name: fullName || username }
-            };
-            setAuthSession(session);
-            showToast(`🎉 Đăng ký thành công! Chào mừng ${session.user.full_name}!`, "success");
-
-            if (btnSubmit) {
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
-            }
-
-            if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('/admin') || window.location.pathname.endsWith('/admin/')) {
-                setTimeout(() => { window.location.href = 'index.html'; }, 500);
-            }
-
-            // Đồng bộ tài khoản mới lên Server ngầm
-            fetch(`${getApiBase()}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, full_name: fullName })
-            }).catch(() => null);
+        // Lưu tài khoản cục bộ tức thì
+        saveRegisteredLocalUser(username, {
+            username: username,
+            password: password,
+            role: 'user',
+            full_name: fullName || username,
+            created_at: new Date().toISOString()
         });
+
+        const session = {
+            token: 'user_reg_token_' + Date.now(),
+            user: { username, role: 'user', full_name: fullName || username }
+        };
+        setAuthSession(session);
+        showToast(`🎉 Đăng ký thành công! Chào mừng ${session.user.full_name}!`, "success");
+
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Tạo Tài Khoản VIP</span>`;
+        }
+
+        const currentPath = window.location.pathname.toLowerCase();
+        if (currentPath.endsWith('admin.html') || currentPath.endsWith('/admin') || currentPath.endsWith('/admin/')) {
+            setTimeout(() => { window.location.href = 'index.html'; }, 300);
+        }
+
+        // Đồng bộ tài khoản mới lên Server ngầm
+        fetch(`${getApiBase()}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, full_name: fullName })
+        }).catch(() => null);
+    }
+
+    if (formRegister) {
+        formRegister.addEventListener('submit', executeRegisterFlow);
+    }
+    const btnSubmitRegister = document.getElementById('btnSubmitRegister');
+    if (btnSubmitRegister) {
+        btnSubmitRegister.addEventListener('click', executeRegisterFlow);
     }
 
     // Khởi tạo trạng thái xác thực khi tải trang
