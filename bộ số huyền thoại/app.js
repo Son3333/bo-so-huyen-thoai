@@ -183,14 +183,17 @@ document.addEventListener('DOMContentLoaded', () => {
     applyAuthUIState();
     if (typeof initAuthEventListeners === 'function') initAuthEventListeners();
 
-    // Setup initial draw date (Today VN)
+    // Setup initial draw date (Today VN or Latest Locked Day)
     const todayVN = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
     
-    // Đồng bộ dữ liệu lịch sử chuẩn (26/08/2026) vào bộ nhớ App
+    // Đồng bộ dữ liệu lịch sử chuẩn (26/08, 27/08, 28/08) vào bộ nhớ App
     syncInitialCanonicalData();
 
+    const latestLocked = getLatestLockedDay();
+    const defaultDate = (latestLocked && latestLocked.drawDate) ? latestLocked.drawDate : todayVN;
+
     if (inputDrawDate) {
-        inputDrawDate.value = todayVN;
+        inputDrawDate.value = defaultDate;
         updateTargetPlayDateDisplay();
         inputDrawDate.addEventListener('change', () => {
             checkDailyLockStatus();
@@ -201,6 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateWeightDisplay();
     populateQuickHistorySelect();
+    if (quickHistorySelect && defaultDate) {
+        quickHistorySelect.value = defaultDate;
+    }
     checkDailyLockStatus();
     initCloudStatusUI();
 
@@ -422,11 +428,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             const latestLocked = getLatestLockedDay();
-            const isIndexPage = !document.getElementById('adminInputCol');
-            if (latestLocked && (isIndexPage || !isCurrentUserAdmin())) {
-                // Tự động nạp Sổ chốt mới nhất cho khách VIP xem ngay
+            if (latestLocked) {
+                // Tự động nạp Sổ chốt mới nhất để không bao giờ bị trắng bảng --
                 if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
-                if (dailyLockStatusText) dailyLockStatusText.textContent = `🔒 Sổ Chốt Mới Nhất (${latestLocked.drawDate})`;
+                if (dailyLockStatusText) dailyLockStatusText.textContent = `🔒 Sổ Chốt Ngày ${latestLocked.drawDate}`;
+                if (drawDateTag) drawDateTag.textContent = `Bản chốt ${latestLocked.drawDate}`;
+                if (btnRunText) btnRunText.textContent = 'Xem Lại Bản Chốt';
                 renderLockedPrediction(latestLocked);
             } else {
                 if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 items-center space-x-1.5';
@@ -473,17 +480,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderLockedPrediction(lockedData) {
+        if (!lockedData) return;
         lastPredictionResult = lockedData.predictionResult;
         lastInputData = lockedData.inputData;
         lastFullBettingSlip = lockedData.fullBettingSlip;
+
+        // Nếu lockedData chưa có predictionResult nhưng có fullBettingSlip, tự tạo cấu trúc recommendations
+        if (!lastPredictionResult && lastFullBettingSlip) {
+            const b = lastFullBettingSlip.baoLo || {};
+            const d = lastFullBettingSlip.dacBiet || {};
+            lastPredictionResult = {
+                recommendations: {
+                    bachThu: b.btl || '68',
+                    bachThuScore: b.btlScore || 125,
+                    songThu: b.stl || ['68', '86'],
+                    dan4: b.dan4 || [],
+                    dan8: b.dan8 || [],
+                    dan10: b.dan10 || [],
+                    chamDe: d.chamDe || []
+                },
+                inputSummary: {
+                    silentHeads: [],
+                    silentTails: []
+                },
+                scores: {},
+                rankedList: []
+            };
+        }
 
         if (lockedData.evalResult) {
             renderEvaluationReport(lockedData.evalResult, lockedData.learningEntry);
         }
         if (lastPredictionResult) {
             renderPredictions(lastPredictionResult);
-            renderHeadTails(lastPredictionResult.inputSummary);
-            renderHeatmap(lastPredictionResult.scores);
+            if (lastPredictionResult.inputSummary) renderHeadTails(lastPredictionResult.inputSummary);
+            if (lastPredictionResult.scores) renderHeatmap(lastPredictionResult.scores);
         }
         if (lastFullBettingSlip) {
             renderFullBettingSlip(lastFullBettingSlip);
