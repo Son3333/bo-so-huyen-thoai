@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BỘ SỐ HUYỀN THOẠI - Sổ Tay Chốt Số Toàn Diện & AI Tự Học</title>
+    <title>BỘ SỐ HUYỀN THOẠI - Sổ Tay Chốt Số Toàn Diện VIP</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,17 +12,8 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: {
-                            900: '#0B0F19',
-                            800: '#111827',
-                            700: '#1F2937',
-                            600: '#374151'
-                        },
-                        gold: {
-                            400: '#FBBF24',
-                            500: '#F59E0B',
-                            600: '#D97706'
-                        }
+                        dark: { 900: '#0B0F19', 800: '#111827', 700: '#1F2937', 600: '#374151' },
+                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
                     }
                 }
             }
@@ -48,7 +39,7 @@
                 </div>
             </div>
 
-            <!-- Header Clock & User Auth & Daily Lock Status & Cloud Sync -->
+            <!-- Header User Auth Controls -->
             <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
                 <!-- User Profile / Role Badge -->
                 <div id="userSessionContainer" class="flex items-center space-x-1 sm:space-x-1.5">
@@ -56,14 +47,16 @@
                         <i data-lucide="shield" class="w-3.5 h-3.5"></i>
                         <span>👑 Quản Trị</span>
                     </a>
+
                     <button id="btnLoginTrigger" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-extrabold text-[11px] sm:text-xs flex items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition whitespace-nowrap">
                         <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
                         <span>Đăng Nhập</span>
                     </button>
+
                     <div id="userProfileBadge" class="hidden items-center space-x-1">
                         <span id="userRoleBadge" class="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center space-x-1 max-w-[120px] sm:max-w-[160px] truncate">
-                            <span id="userRoleIcon">👑</span>
-                            <span id="userFullNameText" class="truncate">Admin</span>
+                            <span id="userRoleIcon">⭐</span>
+                            <span id="userFullNameText" class="truncate">VIP Member</span>
                         </span>
                         <button id="btnLogoutBtn" class="p-1.5 rounded-lg bg-gray-800 hover:bg-rose-950/80 border border-gray-700 hover:border-rose-500/40 text-gray-400 hover:text-rose-400 transition flex-shrink-0" title="Đăng xuất khỏi hệ thống">
                             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -71,1149 +64,343 @@
                     </div>
                 </div>
 
-                <button id="btnOpenCloudModal" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-gray-800/90 hover:bg-gray-700/90 border border-gray-700 text-xs font-semibold text-gray-300 hover:text-white flex items-center space-x-1.5 transition flex-shrink-0" title="Đồng bộ Cloud Render (Web & Điện Thoại)">
+                <button id="btnOpenCloudModal" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-gray-800/90 hover:bg-gray-700/90 border border-gray-700 text-xs font-semibold text-gray-300 hover:text-white flex items-center space-x-1.5 transition flex-shrink-0" title="Đồng bộ Cloud Render">
                     <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
                     <span id="cloudStatusText" class="hidden md:inline">☁️ Cloud Live</span>
                 </button>
-                <div class="hidden lg:flex items-center px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs font-mono text-amber-300">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5 text-amber-400"></i>
-                    <span id="vnLiveClock">--:--:-- (VN)</span>
-                </div>
-                <div id="dailyLockBadge" class="hidden md:flex px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 items-center space-x-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span id="dailyLockStatusText">🟢 Sẵn sàng</span>
-                </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Navigation Tabs (Chỉ Hiện Trên Máy Tính / Desktop) -->
-    <div class="hidden md:block border-b border-gray-800 bg-gray-900/40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2.5 text-sm font-medium">
-                <button class="nav-tab active flex items-center space-x-2 px-3 py-1.5 rounded-lg text-amber-400 bg-amber-500/10 border border-amber-500/30 transition whitespace-nowrap" data-target="tab-predict">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span id="navPredictTitle">Sổ Tay Chốt Số VIP</span>
-                </button>
-                <button class="nav-tab flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-history">
-                    <i data-lucide="history" class="w-4 h-4 text-amber-400"></i>
-                    <span class="text-amber-300 font-semibold">Tra Cứu Lịch Sử</span>
-                </button>
-                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-matrix">
-                    <i data-lucide="grid" class="w-4 h-4"></i>
-                    <span>Ma Trận 100 Số</span>
-                </button>
-                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-board">
-                    <i data-lucide="table" class="w-4 h-4"></i>
-                    <span>Bảng Đầu - Đuôi</span>
-                </button>
-                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-mysql">
-                    <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i>
-                    <span class="text-cyan-300">MySQL & Học Sâu</span>
-                </button>
-                <button class="nav-tab admin-tab-btn flex items-center space-x-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 transition whitespace-nowrap" data-target="tab-rules">
-                    <i data-lucide="book-open" class="w-4 h-4"></i>
-                    <span>Quy Tắc Bạc Nhớ</span>
-                </button>
-            </nav>
-        </div>
-    </div>
-
     <!-- Main Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
-        <!-- TAB 1: DỰ ĐOÁN & AI TỰ HỌC (MAIN TAB) -->
-        <section id="tab-predict" class="tab-content space-y-6">
+        <!-- VIP Member Welcome Banner -->
+        <div id="userVipWelcomeBanner" class="glass-panel rounded-2xl p-3.5 sm:p-4 border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-gray-900/90 to-amber-950/30 shadow-xl space-y-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div class="flex items-center space-x-2.5 min-w-0">
+                    <span class="p-1.5 sm:p-2 rounded-xl bg-amber-500/20 text-amber-400 text-base sm:text-lg flex-shrink-0">⭐</span>
+                    <div class="min-w-0">
+                        <h3 class="text-xs sm:text-base font-extrabold text-amber-300 truncate">CHÀO MỪNG THÀNH VIÊN VIP: <span id="vipUsernameText" class="text-white">loc889999</span></h3>
+                        <p class="text-[11px] sm:text-xs text-gray-400 line-clamp-1">Sổ Tay Chốt Số Toàn Diện đã được Chuyên Gia & AI Master phê duyệt</p>
+                    </div>
+                </div>
+                <span class="self-start sm:self-auto px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap flex-shrink-0 animate-pulse">
+                    ● VIP ACTIVE
+                </span>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- 📋 SỔ TAY GHI CHÉP CHỐT SỐ TOÀN DIỆN (FULL BETTING SLIP) -->
+        <!-- ============================================================= -->
+        <div id="fullBettingSlipSection" class="glass-panel rounded-2xl p-4 sm:p-6 border border-amber-500/50 bg-gradient-to-b from-gray-900 via-gray-900 to-black shadow-2xl space-y-5 sm:space-y-6">
             
-            <!-- Quick Past Slip Navigator Bar (Chỉ Admin) -->
-            <div id="quickHistoryBar" class="admin-only-section glass-panel rounded-2xl p-3.5 border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-900/90 shadow-md">
-                <div class="flex items-center space-x-2 text-xs">
-                    <span class="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 font-bold">🔍 Tra Cứu Nhanh:</span>
-                    <span class="text-gray-300">Xem lại bản chốt số của các ngày trước đó:</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <select id="quickHistorySelect" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-500">
-                        <option value="">-- Chọn ngày đã chốt để xem lại --</option>
-                    </select>
-                    <button id="btnViewSelectedHistory" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition flex items-center space-x-1">
-                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                        <span>Xem Lại Sổ Chốt</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- VIP Member Welcome Banner (Chỉ hiện khi là User / Khách VIP) -->
-            <div id="userVipWelcomeBanner" class="hidden glass-panel rounded-2xl p-3.5 sm:p-4 border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-gray-900/90 to-amber-950/30 shadow-xl space-y-2">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <span class="p-1.5 sm:p-2 rounded-xl bg-amber-500/20 text-amber-400 text-base sm:text-lg flex-shrink-0">⭐</span>
-                        <div class="min-w-0">
-                            <h3 class="text-xs sm:text-base font-extrabold text-amber-300 truncate">CHÀO MỪNG THÀNH VIÊN VIP: <span id="vipUsernameText" class="text-white">loc889999</span></h3>
-                            <p class="text-[11px] sm:text-xs text-gray-400 line-clamp-1">Sổ Tay Chốt Số Toàn Diện đã được Chuyên Gia & AI Master phê duyệt</p>
-                        </div>
-                    </div>
-                    <span class="self-start sm:self-auto px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap flex-shrink-0 animate-pulse">
-                        ● VIP ACTIVE
-                    </span>
-                </div>
-            </div>
-
-            <!-- 🤖 AUTONOMOUS LEARNING & EVALUATION CARD (Chỉ Admin) -->
-            <div id="aiEvaluationPanel" class="admin-only-section glass-panel rounded-2xl p-5 border border-amber-500/50 bg-gradient-to-r from-amber-950/30 via-gray-900 to-cyan-950/30 shadow-2xl space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/10">
-                            <i data-lucide="brain-circuit" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h3 class="font-black text-sm text-gray-100 uppercase tracking-wide">
-                                    BẢNG ĐỐI SOÁT TRÚNG / TRƯỢT & BÀI HỌC AI RÚT RA
-                                </h3>
-                                <span id="evalAccuracyBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-black animate-pulse">
-                                    100đ • ĐẠI THẮNG
-                                </span>
-                            </div>
-                            <p class="text-[11px] text-gray-400">Tự động so khớp kết quả mở thưởng hôm nay với Sổ Tay Chốt Số kỳ trước để AI tự học tăng cường</p>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic Weight Badges -->
-                    <div class="flex items-center space-x-2 text-[10px] font-mono">
-                        <span class="px-2 py-1 rounded bg-gray-800 border border-gray-700 text-amber-300">W(Bạc Nhớ): <strong id="weightBacNho">28đ</strong></span>
-                        <span class="px-2 py-1 rounded bg-gray-800 border border-gray-700 text-cyan-300">W(Đầu Câm): <strong id="weightDauCam">32đ</strong></span>
-                        <span class="px-2 py-1 rounded bg-gray-800 border border-gray-700 text-purple-300">W(Bóng Số): <strong id="weightBongSo">22đ</strong></span>
-                    </div>
-                </div>
-
-                <!-- 4 Comprehensive Verification Categories Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                    
-                    <!-- 1. Bao Lô & Lô Kép -->
-                    <div class="p-3.5 rounded-xl bg-gray-900/90 border border-amber-500/30 space-y-2">
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-1.5">
-                            <span class="text-amber-400 font-bold flex items-center space-x-1">
-                                <i data-lucide="crown" class="w-3.5 h-3.5"></i>
-                                <span>1. BAO LÔ & LÔ KÉP</span>
-                            </span>
-                            <span class="text-[10px] text-gray-500 font-mono">Lô Tô</span>
-                        </div>
-                        <div class="space-y-1 text-[11px]">
-                            <div>• Bạch Thủ: <span id="evalBTL" class="font-bold text-gray-300">Chưa có kỳ trước</span></div>
-                            <div>• Song Thủ: <span id="evalSTL" class="font-bold text-gray-300">--</span></div>
-                            <div>• Dàn Lô 4/8/10: <span id="evalDanLotto" class="font-bold text-gray-300">--</span></div>
-                            <div>• Lô Kép: <span id="evalKep" class="font-bold text-gray-300">--</span></div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Lô Xiên & Xiên Quay -->
-                    <div class="p-3.5 rounded-xl bg-gray-900/90 border border-cyan-500/30 space-y-2">
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-1.5">
-                            <span class="text-cyan-400 font-bold flex items-center space-x-1">
-                                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-                                <span>2. XIÊN & XIÊN QUAY</span>
-                            </span>
-                            <span class="text-[10px] text-gray-500 font-mono">Lô Xiên</span>
-                        </div>
-                        <div class="space-y-1 text-[11px]">
-                            <div>• Cặp Xiên 2: <span id="evalXien2" class="font-bold text-gray-300">--</span></div>
-                            <div>• Xiên Quay 4: <span id="evalXienQuay" class="font-bold text-gray-300">--</span></div>
-                        </div>
-                    </div>
-
-                    <!-- 3. Giải Đặc Biệt & Dàn Đề -->
-                    <div class="p-3.5 rounded-xl bg-gray-900/90 border border-pink-500/30 space-y-2">
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-1.5">
-                            <span class="text-pink-400 font-bold flex items-center space-x-1">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                <span>3. ĐẶC BIỆT & DÀN ĐỀ</span>
-                            </span>
-                            <span class="text-[10px] text-gray-500 font-mono">Đề GĐB</span>
-                        </div>
-                        <div class="space-y-1 text-[11px]">
-                            <div>• Đề BTL/STL: <span id="evalDeBTL" class="font-bold text-gray-300">--</span></div>
-                            <div>• Chạm Đề GĐB: <span id="evalChamDe" class="font-bold text-gray-300">--</span></div>
-                            <div>• Dàn Đề 10/20/36/64: <span id="evalDanDe" class="font-bold text-gray-300">--</span></div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Ba Càng Lô & Đề -->
-                    <div class="p-3.5 rounded-xl bg-gray-900/90 border border-purple-500/30 space-y-2">
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-1.5">
-                            <span class="text-purple-400 font-bold flex items-center space-x-1">
-                                <i data-lucide="flame" class="w-3.5 h-3.5"></i>
-                                <span>4. BA CÀNG LÔ & ĐỀ</span>
-                            </span>
-                            <span class="text-[10px] text-gray-500 font-mono">3 Càng</span>
-                        </div>
-                        <div class="space-y-1 text-[11px]">
-                            <div>• 3 Càng Đề VIP: <span id="eval3CangDe" class="font-bold text-gray-300">--</span></div>
-                            <div>• 3 Càng Lô VIP: <span id="eval3CangLo" class="font-bold text-gray-300">--</span></div>
-                            <div>• Dàn 3 Càng: <span id="evalDan3Cang" class="font-bold text-gray-300">--</span></div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- AI Insights Lessons Learned -->
-                <div id="aiLessonsBox" class="p-3 rounded-xl bg-gray-950/90 border border-gray-800 text-xs space-y-1.5">
-                    <div class="font-bold text-amber-400 flex items-center space-x-1.5 text-xs">
-                        <i data-lucide="sparkle" class="w-4 h-4 text-amber-400 animate-spin"></i>
-                        <span>BÀI HỌC KINH NGHIỆM AI TỰ RÚT RA ĐỂ TỐI ƯU HÓA MA TRẬN TRỌNG SỐ:</span>
-                    </div>
-                    <div id="aiLessonsList" class="text-gray-300 text-xs space-y-1 pl-2">
-                        <div>✨ Đang sẵn sàng thu nhận dữ liệu kỳ quay mới để đối soát và tự động nâng cao độ nhạy của thuật toán.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Input & Quick Overview Grid (Chỉ Admin Mới Được Xem & Thao Tác) -->
-            <div id="adminInputAnalysisRow" class="admin-only-section grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                <!-- Left Column: Input Panel (4 Cols - Chỉ Admin được thấy & thao tác) -->
-                <div id="adminInputCol" class="admin-only-section lg:col-span-4 space-y-5">
-                    <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                            <div class="flex items-center space-x-2">
-                                <i data-lucide="arrow-down-to-dot" class="w-5 h-5 text-amber-400"></i>
-                                <h2 class="font-bold text-gray-100">Nạp Kết Quả Kỳ Mở Thưởng</h2>
-                            </div>
-                            <span id="drawDateTag" class="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-400">Kỳ mới</span>
-                        </div>
-
-                        <!-- Date input -->
-                        <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-semibold text-gray-400">Kỳ mở thưởng căn cứ:</label>
-                                <button id="btnAutoFetchOnline" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-xs font-bold text-white transition flex items-center space-x-1 shadow animate-pulse" title="Tự động cào kết quả từ Internet">
-                                    <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-                                    <span>🌐 Tự Động Lấy Online</span>
-                                </button>
-                            </div>
-                            <input type="date" id="inputDrawDate" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-amber-500 transition font-mono">
-                            <div class="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-300 flex items-center justify-between font-medium">
-                                <span class="flex items-center space-x-1.5">
-                                    <i data-lucide="target" class="w-3.5 h-3.5 text-amber-400"></i>
-                                    <span>🎯 Dự đoán đánh cho ngày mai:</span>
-                                </span>
-                                <strong id="targetPlayDateBadge" class="text-white font-bold bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">--/--/----</strong>
-                            </div>
-                        </div>
-
-                        <!-- Mode Switch -->
-                        <div class="flex rounded-xl bg-gray-900 p-1 border border-gray-800 text-xs">
-                            <button id="modeQuickBtn" class="flex-1 py-1.5 rounded-lg bg-amber-500 font-semibold text-black transition shadow">
-                                Dán Nhanh Text
-                            </button>
-                            <button id="modeFullBtn" class="flex-1 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 font-medium transition">
-                                Nhập 27 Giải XSMB
-                            </button>
-                        </div>
-
-                        <!-- Quick Text Mode -->
-                        <div id="quickInputContainer" class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-xs text-gray-400">
-                                    Dán chuỗi 27 giải hoặc các số lô 2 số đã về:
-                                </label>
-                                <button id="btnPasteClipboard" type="button" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center space-x-1 transition shadow active:scale-95" title="Dán kết quả vừa sao chép từ Zalo/Facebook/Web">
-                                    <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 text-amber-400"></i>
-                                    <span>📋 Dán Nhanh</span>
-                                </button>
-                            </div>
-                            <textarea id="quickInputText" rows="4" placeholder="Ví dụ: 89, 45, 23, 01, 76, 54, 99, 12, 34, 67, 88..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl p-3 text-sm text-amber-300 font-mono focus:outline-none focus:border-amber-500 transition placeholder-gray-600 resize-none"></textarea>
-                            <div class="flex items-center justify-between text-[11px] text-gray-500">
-                                <span id="quickCountBadge">Đã nhận: 0 số</span>
-                                <span>Tách bằng dấu phẩy, cách hoặc xuống dòng</span>
-                            </div>
-                        </div>
-
-                        <!-- Full Board Mode -->
-                        <div id="fullBoardContainer" class="hidden space-y-3 max-h-80 overflow-y-auto pr-1">
-                            <div>
-                                <label class="text-[11px] font-bold text-red-400">Giải Đặc Biệt (GĐB):</label>
-                                <input type="text" id="g_gdb" inputmode="numeric" pattern="[0-9]*" placeholder="Ví dụ: 84723" class="w-full bg-gray-900 border border-red-500/40 rounded-lg px-2.5 py-1.5 text-sm font-bold text-red-400 font-mono">
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-amber-400">Giải Nhất (G1):</label>
-                                <input type="text" id="g_g1" inputmode="numeric" pattern="[0-9]*" placeholder="Ví dụ: 59389" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-mono">
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-blue-400">Giải Nhì (2 giải):</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" id="g_g2_1" inputmode="numeric" pattern="[0-9]*" placeholder="G2.1" class="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-mono">
-                                    <input type="text" id="g_g2_2" inputmode="numeric" pattern="[0-9]*" placeholder="G2.2" class="bg-gray-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-mono">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-green-400">Giải Ba (6 giải):</label>
-                                <div class="grid grid-cols-3 gap-1.5">
-                                    <input type="text" id="g_g3_1" inputmode="numeric" pattern="[0-9]*" placeholder="G3.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_2" inputmode="numeric" pattern="[0-9]*" placeholder="G3.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_3" inputmode="numeric" pattern="[0-9]*" placeholder="G3.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_4" inputmode="numeric" pattern="[0-9]*" placeholder="G3.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_5" inputmode="numeric" pattern="[0-9]*" placeholder="G3.5" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g3_6" inputmode="numeric" pattern="[0-9]*" placeholder="G3.6" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-cyan-400">Giải Tư (4 giải):</label>
-                                <div class="grid grid-cols-2 gap-1.5">
-                                    <input type="text" id="g_g4_1" inputmode="numeric" pattern="[0-9]*" placeholder="G4.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g4_2" inputmode="numeric" pattern="[0-9]*" placeholder="G4.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g4_3" inputmode="numeric" pattern="[0-9]*" placeholder="G4.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g4_4" inputmode="numeric" pattern="[0-9]*" placeholder="G4.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-purple-400">Giải Năm (6 giải):</label>
-                                <div class="grid grid-cols-3 gap-1.5">
-                                    <input type="text" id="g_g5_1" inputmode="numeric" pattern="[0-9]*" placeholder="G5.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_2" inputmode="numeric" pattern="[0-9]*" placeholder="G5.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_3" inputmode="numeric" pattern="[0-9]*" placeholder="G5.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_4" inputmode="numeric" pattern="[0-9]*" placeholder="G5.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_5" inputmode="numeric" pattern="[0-9]*" placeholder="G5.5" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g5_6" inputmode="numeric" pattern="[0-9]*" placeholder="G5.6" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-emerald-400">Giải Sáu (3 giải):</label>
-                                <div class="grid grid-cols-3 gap-1.5">
-                                    <input type="text" id="g_g6_1" inputmode="numeric" pattern="[0-9]*" placeholder="G6.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g6_2" inputmode="numeric" pattern="[0-9]*" placeholder="G6.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g6_3" inputmode="numeric" pattern="[0-9]*" placeholder="G6.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[11px] font-semibold text-rose-400">Giải Bảy (4 giải):</label>
-                                <div class="grid grid-cols-4 gap-1.5">
-                                    <input type="text" id="g_g7_1" inputmode="numeric" pattern="[0-9]*" placeholder="G7.1" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g7_2" inputmode="numeric" pattern="[0-9]*" placeholder="G7.2" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g7_3" inputmode="numeric" pattern="[0-9]*" placeholder="G7.3" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                    <input type="text" id="g_g7_4" inputmode="numeric" pattern="[0-9]*" placeholder="G7.4" class="bg-gray-900 border border-gray-700 rounded-lg p-1 text-xs font-mono">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="pt-2 space-y-2">
-                            <button id="btnRunPrediction" class="btn-gradient-primary w-full py-3 rounded-xl font-black text-black text-sm tracking-wide uppercase flex items-center justify-center space-x-2 shadow-lg">
-                                <i data-lucide="zap" class="w-5 h-5"></i>
-                                <span id="btnRunText">Tự Học & Chốt Số Ngày Mai</span>
-                            </button>
-                            <div class="pt-1">
-                                <button id="btnClearInput" class="w-full py-2 rounded-xl bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700/50 text-xs font-semibold text-gray-400 hover:text-gray-200 transition flex items-center justify-center space-x-1.5">
-                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                                    <span>Làm Mới / Xóa Trắng Bảng Nhập</span>
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Silent Indicator -->
-                    <div id="silentAlertCard" class="glass-panel rounded-2xl p-4 border border-gray-800 space-y-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center space-x-1.5">
-                            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
-                            <span>Tín Hiệu Câm Hôm Nay</span>
-                        </h3>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="p-2.5 rounded-xl bg-gray-900 border border-gray-800">
-                                <span class="text-gray-400 block text-[11px]">Đầu Câm:</span>
-                                <span id="silentHeadsList" class="font-bold text-red-400">Không có</span>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-gray-900 border border-gray-800">
-                                <span class="text-gray-400 block text-[11px]">Đuôi Câm:</span>
-                                <span id="silentTailsList" class="font-bold text-orange-400">Không có</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Top VIP Quick Badges & Full Betting Slip (8 Cols for Admin / 12 Cols for VIP User) -->
-                <div id="predictionOutputCol" class="lg:col-span-8 space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        
-                        <!-- Bạch Thủ Lô VIP -->
-                        <div class="vip-card-gold rounded-2xl p-4 relative overflow-hidden flex flex-col justify-between">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
-                                    <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
-                                    <span>Bạch Thủ Lô VIP</span>
-                                </span>
-                                <span id="btlScoreBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">0đ</span>
-                            </div>
-                            <div class="my-4 text-center">
-                                <span id="resBachThu" class="text-5xl font-black tracking-tight text-amber-300 drop-shadow-md">--</span>
-                            </div>
-                            <div class="text-[11px] text-amber-400/80 text-center flex items-center justify-center space-x-1">
-                                <span>Tối ưu từ bài học hôm nay</span>
-                            </div>
-                        </div>
-
-                        <!-- Song Thủ Lô VIP -->
-                        <div class="vip-card-cyan rounded-2xl p-4 relative overflow-hidden flex flex-col justify-between">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-400 flex items-center space-x-1">
-                                    <i data-lucide="gem" class="w-4 h-4 text-cyan-400"></i>
-                                    <span>Song Thủ Lô VIP</span>
-                                </span>
-                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Cặp Đẹp</span>
-                            </div>
-                            <div class="my-4 text-center">
-                                <span id="resSongThu" class="text-4xl font-black tracking-tight text-cyan-300 drop-shadow-md">-- - --</span>
-                            </div>
-                            <div class="text-[11px] text-cyan-400/80 text-center">
-                                <span>Cặp số tương hỗ tương sinh</span>
-                            </div>
-                        </div>
-
-                        <!-- Đề Bạch Thủ & 3 Càng -->
-                        <div class="vip-card-purple rounded-2xl p-4 relative overflow-hidden flex flex-col justify-between">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-extrabold uppercase tracking-wider text-purple-400 flex items-center space-x-1">
-                                    <i data-lucide="flame" class="w-4 h-4 text-purple-400"></i>
-                                    <span>Đặc Biệt & 3 Càng</span>
-                                </span>
-                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Đặc Biệt</span>
-                            </div>
-                            <div class="my-3 space-y-1 text-center">
-                                <div class="text-xs text-gray-400">Đề BTL: <span id="resDeBTL" class="text-lg font-black text-pink-300">--</span></div>
-                                <div class="text-xs text-gray-400">3 Càng Lô: <span id="res3CangVIP" class="text-base font-black text-purple-300">--</span></div>
-                            </div>
-                            <div class="text-[11px] text-purple-400/80 text-center">
-                                <span>Cầu giải Đặc Biệt & 3 Càng</span>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Top Ranked Table -->
-                    <div class="glass-panel rounded-2xl p-5 border border-gray-800 space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                            <h3 class="font-bold text-gray-100 flex items-center space-x-2">
-                                <i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-400"></i>
-                                <span>Bảng Xếp Hạng Điểm Dự Đoán (Top 10 Sáng Nhất)</span>
-                            </h3>
-                            <span class="text-xs text-gray-400">Click vào số để xem chi tiết lý do</span>
-                        </div>
-
-                        <div id="topRankedTable" class="space-y-2">
-                            <div class="text-center py-6 text-gray-500 text-xs">
-                                Chưa có dữ liệu. Nhấn "Tự Học & Chốt Số Ngày Mai" để xem bảng xếp hạng.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- ============================================================= -->
-            <!-- 📋 SỔ TAY GHI CHÉP CHỐT SỐ TOÀN DIỆN (FULL BETTING SLIP) -->
-            <!-- ============================================================= -->
-            <div id="fullBettingSlipSection" class="glass-panel rounded-2xl p-4 sm:p-6 border border-amber-500/50 bg-gradient-to-b from-gray-900 via-gray-900 to-black shadow-2xl space-y-5 sm:space-y-6">
-                
-                <!-- Slip Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-gray-800">
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between sm:justify-start gap-2 flex-wrap">
-                            <h2 class="font-black text-base sm:text-xl text-amber-400 uppercase tracking-wide flex items-center space-x-1.5">
-                                <span>📋</span>
-                                <span>SỔ TAY CHỐT SỐ ĐÁNH NGÀY: <span id="slipTargetDateText" class="text-white drop-shadow">--/--/----</span></span>
-                            </h2>
-                            <span id="slipLockBadge" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold whitespace-nowrap flex-shrink-0">
-                                🔒 ĐÃ CHỐT CỐ ĐỊNH
-                            </span>
-                        </div>
-                        <p class="text-[11px] sm:text-xs text-gray-400">
-                            🎯 Mục tiêu đánh ngày: <strong id="slipTargetDateSub" class="text-amber-300">--</strong> • Phân tích từ kỳ mở thưởng ngày: <span id="slipBaseDateText" class="text-gray-300 font-semibold">--</span>
-                        </p>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pt-1 sm:pt-0">
-                        <button id="btnCopyFullSlip" class="py-2.5 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-black text-xs transition shadow-lg flex items-center justify-center space-x-1.5 active:scale-95">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
-                            <span class="truncate">Copy Sổ Chốt</span>
-                        </button>
-                        <button id="btnPrintSlip" class="py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs text-gray-200 transition flex items-center justify-center space-x-1.5 active:scale-95">
-                            <i data-lucide="printer" class="w-4 h-4"></i>
-                            <span>In Phiếu</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 4 Main Betting Categories Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    
-                    <!-- MỤC 1: BAO LÔ TÔ (LÔ TÔ CÁC LOẠI) -->
-                    <div class="p-4 rounded-2xl bg-gray-900/90 border border-amber-500/30 space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-gray-800">
-                            <h4 class="font-bold text-sm text-amber-400 flex items-center space-x-2">
-                                <span>⭐ 1. BAO LÔ TÔ (CÁC LOẠI)</span>
-                            </h4>
-                            <button class="text-[11px] text-amber-400 hover:underline" onclick="window.copySection('baoLo')">Copy mục</button>
-                        </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
-                                <span class="text-gray-400 font-semibold">🌟 Bạch Thủ Lô VIP (1 con):</span>
-                                <span id="slipBTL" class="font-mono font-black text-base text-amber-300">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
-                                <span class="text-gray-400 font-semibold">💎 Song Thủ Lô VIP (1 cặp):</span>
-                                <span id="slipSTL" class="font-mono font-black text-sm text-cyan-300">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
-                                <span class="text-gray-400 font-semibold">🎯 Lô Kép Đẹp (2-3 con):</span>
-                                <span id="slipKep" class="font-mono font-bold text-sm text-purple-300">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">🔥 Dàn Lô 4 Số (Bất Bại):</span>
-                                <span id="slipDan4" class="font-mono font-black text-sm text-yellow-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">⚡ Dàn Lô 8 Số (Bao Khung):</span>
-                                <span id="slipDan8" class="font-mono font-bold text-xs text-emerald-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">📊 Dàn Lô 10 Số (Toàn Diện):</span>
-                                <span id="slipDan10" class="font-mono font-bold text-xs text-gray-300 tracking-wider">--</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MỤC 2: LÔ XIÊN & XIÊN QUAY (CÁC LOẠI) -->
-                    <div class="p-4 rounded-2xl bg-gray-900/90 border border-cyan-500/30 space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-gray-800">
-                            <h4 class="font-bold text-sm text-cyan-400 flex items-center space-x-2">
-                                <span>🎯 2. LÔ XIÊN & XIÊN QUAY (CÁC LOẠI)</span>
-                            </h4>
-                            <button class="text-[11px] text-cyan-400 hover:underline" onclick="window.copySection('loXien')">Copy mục</button>
-                        </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">⚡ Cặp Xiên 2 Đẹp:</span>
-                                <span id="slipXien2" class="font-mono font-bold text-xs text-cyan-300 tracking-wide">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">🏆 Bộ Xiên 3 VIP:</span>
-                                <span id="slipXien3" class="font-mono font-bold text-xs text-purple-300 tracking-wide">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">👑 Bộ Xiên 4 VIP:</span>
-                                <span id="slipXien4" class="font-mono font-bold text-xs text-pink-300 tracking-wide">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-400 font-semibold">🔄 Dàn Xiên Quay 4 Con:</span>
-                                    <span id="slipXQCore" class="font-mono font-bold text-amber-300">--</span>
-                                </div>
-                                <div class="text-[11px] text-gray-400">
-                                    Gồm 6 cặp xiên 2, 4 bộ xiên 3 & 1 bộ xiên 4:
-                                </div>
-                                <div id="slipXQDetails" class="font-mono text-[11px] text-gray-300 leading-relaxed bg-gray-950 p-2 rounded border border-gray-800 max-h-24 overflow-y-auto">
-                                    --
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MỤC 3: ĐẶC BIỆT & DÀN ĐỀ (CÁC LOẠI) -->
-                    <div class="p-4 rounded-2xl bg-gray-900/90 border border-pink-500/30 space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-gray-800">
-                            <h4 class="font-bold text-sm text-pink-400 flex items-center space-x-2">
-                                <span>👑 3. ĐẶC BIỆT & DÀN ĐỀ (CÁC LOẠI)</span>
-                            </h4>
-                            <button class="text-[11px] text-pink-400 hover:underline" onclick="window.copySection('dacBiet')">Copy mục</button>
-                        </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div class="p-2 rounded-lg bg-gray-800/80">
-                                    <span class="text-gray-400 block text-[11px]">Đề Bạch Thủ:</span>
-                                    <span id="slipDeBTL" class="font-mono font-black text-base text-pink-300">--</span>
-                                </div>
-                                <div class="p-2 rounded-lg bg-gray-800/80">
-                                    <span class="text-gray-400 block text-[11px]">Đề Song Thủ:</span>
-                                    <span id="slipDeSTL" class="font-mono font-black text-sm text-amber-300">--</span>
-                                </div>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
-                                <span class="text-gray-400 font-semibold">Chạm Đề & Tổng Đề:</span>
-                                <span id="slipChamDe" class="font-mono font-bold text-xs text-cyan-300">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">Dàn Đề 10 Số:</span>
-                                <span id="slipDanDe10" class="font-mono font-bold text-xs text-yellow-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">Dàn Đề 20 Số:</span>
-                                <span id="slipDanDe20" class="font-mono font-bold text-[11px] text-emerald-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">Dàn Đề 36 Số (Chạm Đầu - Đuôi):</span>
-                                <span id="slipDanDe36" class="font-mono font-medium text-[11px] text-gray-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">Dàn Đề 64 Số (Khung An Toàn):</span>
-                                <span id="slipDanDe64" class="font-mono font-medium text-[10px] text-gray-400 tracking-wider max-h-16 overflow-y-auto block">--</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MỤC 4: BA CÀNG (3 CÀNG LÔ & 3 CÀNG ĐỀ) -->
-                    <div class="p-4 rounded-2xl bg-gray-900/90 border border-purple-500/30 space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-gray-800">
-                            <h4 class="font-bold text-sm text-purple-400 flex items-center space-x-2">
-                                <span>🔮 4. BA CÀNG (3 CÀNG CÁC LOẠI)</span>
-                            </h4>
-                            <button class="text-[11px] text-purple-400 hover:underline" onclick="window.copySection('baCang')">Copy mục</button>
-                        </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
-                                <span class="text-gray-400 font-semibold">Càng Sáng Đẹp (0..9):</span>
-                                <span id="slipTopCangs" class="font-mono font-black text-sm text-amber-300">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">🌟 Ba Càng Lô VIP:</span>
-                                <span id="slip3CangLo" class="font-mono font-black text-sm text-purple-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">👑 Ba Càng Đề Đặc Biệt VIP:</span>
-                                <span id="slip3CangDe" class="font-mono font-black text-sm text-pink-300 tracking-wider">--</span>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
-                                <span class="text-gray-400 font-semibold block">🔮 Dàn Ba Càng Đẹp (Ghép Dàn Đề):</span>
-                                <span id="slipDan3Cang" class="font-mono font-medium text-[11px] text-cyan-300 tracking-wider max-h-20 overflow-y-auto block">--</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- TAB 2: LỊCH SỬ & TRA CỨU SỔ CHỐT TOÀN DIỆN (NEW DEDICATED TAB) -->
-        <section id="tab-history" class="tab-content hidden space-y-5">
-            <div class="glass-panel rounded-2xl p-6 border border-gray-800 space-y-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
-                    <div>
-                        <h2 class="font-bold text-gray-100 text-lg flex items-center space-x-2">
-                            <i data-lucide="history" class="w-5 h-5 text-amber-400"></i>
-                            <span>Lịch Sử Chốt Số & Tra Cứu Lại Bản Dự Đoán Các Ngày Trước</span>
+            <!-- Slip Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-gray-800">
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between sm:justify-start gap-2 flex-wrap">
+                        <h2 class="font-black text-base sm:text-xl text-amber-400 uppercase tracking-wide flex items-center space-x-1.5">
+                            <span>📋</span>
+                            <span>SỔ TAY CHỐT SỐ ĐÁNH NGÀY: <span id="slipTargetDateText" class="text-white drop-shadow">--/--/----</span></span>
                         </h2>
-                        <p class="text-xs text-gray-400">Mọi bản chốt số bạn từng bấm dự đoán đều được lưu trữ vĩnh viễn ở đây để bạn xem lại bất cứ khi nào</p>
-                    </div>
-                    <button id="btnClearHistory" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-red-400 transition">
-                        Xóa Toàn Bộ Lịch Sử
-                    </button>
-                </div>
-
-                <!-- History List Container -->
-                <div id="historyListContainer" class="space-y-4">
-                    <div class="text-center py-8 text-gray-500 text-xs">
-                        Chưa có kỳ quay nào được lưu vào lịch sử.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 3: HEATMAP 100 SỐ (00 - 99) -->
-        <section id="tab-matrix" class="tab-content hidden space-y-5">
-            <div class="glass-panel rounded-2xl p-5 border border-gray-800 space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-gray-800">
-                    <div>
-                        <h2 class="font-bold text-gray-100 text-lg flex items-center space-x-2">
-                            <i data-lucide="grid" class="w-5 h-5 text-amber-400"></i>
-                            <span>Ma Trận Nhiệt 100 Số (Heatmap 00 - 99)</span>
-                        </h2>
-                        <p class="text-xs text-gray-400">Màu sắc thể hiện mức độ hội tụ điểm số từ các thuật toán bạc nhớ đã tự học</p>
-                    </div>
-
-                    <div class="flex items-center space-x-3 text-xs">
-                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-red-600"></span><span>Rất Cao</span></span>
-                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-orange-600"></span><span>Cao</span></span>
-                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-yellow-600"></span><span>Trung Bình</span></span>
-                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-emerald-700"></span><span>Tiềm Năng</span></span>
-                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded bg-slate-800"></span><span>Bình Thường</span></span>
-                    </div>
-                </div>
-
-                <div id="heatmapGrid" class="grid grid-cols-10 gap-1.5 sm:gap-2"></div>
-            </div>
-        </section>
-
-        <!-- TAB 4: BẢNG ĐẦU - ĐUÔI LÔ TÔ -->
-        <section id="tab-board" class="tab-content hidden space-y-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-panel rounded-2xl p-5 border border-gray-800 space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                        <h3 class="font-bold text-gray-100 flex items-center space-x-2">
-                            <i data-lucide="arrow-right-to-line" class="w-5 h-5 text-amber-400"></i>
-                            <span>Bảng Thống Kê Đầu Lô Tô (0 - 9)</span>
-                        </h3>
-                    </div>
-                    <div id="headsTable" class="space-y-2 text-sm"></div>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-5 border border-gray-800 space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                        <h3 class="font-bold text-gray-100 flex items-center space-x-2">
-                            <i data-lucide="arrow-left-to-line" class="w-5 h-5 text-cyan-400"></i>
-                            <span>Bảng Thống Kê Đuôi (Đít) Lô Tô (0 - 9)</span>
-                        </h3>
-                    </div>
-                    <div id="tailsTable" class="space-y-2 text-sm"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 5: MYSQL & AI DEEP LEARNING -->
-        <section id="tab-mysql" class="tab-content hidden space-y-6">
-            <div class="glass-panel rounded-2xl p-6 border border-gray-800 space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
-                    <div>
-                        <h2 class="font-bold text-gray-100 text-lg flex items-center space-x-2">
-                            <i data-lucide="database" class="w-5 h-5 text-cyan-400"></i>
-                            <span>Cơ Sở Dữ Liệu MySQL & Dữ Liệu Học Sâu (Deep Learning)</span>
-                        </h2>
-                        <p class="text-xs text-gray-400">Lưu trữ toàn diện 27 giải, vector 100 chiều và xuất dữ liệu huấn luyện mô hình mạng nơ-ron LSTM</p>
-                    </div>
-
-                    <div class="flex items-center space-x-3">
-                        <span id="mysqlStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-800 border border-gray-700 text-gray-400 flex items-center space-x-1.5">
-                            <span class="w-2 h-2 rounded-full bg-gray-500"></span>
-                            <span>Trạng thái: Sẵn sàng lưu trữ</span>
+                        <span id="slipLockBadge" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold whitespace-nowrap flex-shrink-0">
+                            🔒 ĐÃ CHỐT CỐ ĐỊNH
                         </span>
                     </div>
+                    <p class="text-[11px] sm:text-xs text-gray-400">
+                        🎯 Mục tiêu đánh ngày: <strong id="slipTargetDateSub" class="text-amber-300">--</strong> • Phân tích từ kỳ mở thưởng ngày: <span id="slipBaseDateText" class="text-gray-300 font-semibold">--</span>
+                    </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center space-x-2 text-cyan-400 font-bold text-sm">
-                                <i data-lucide="save" class="w-4 h-4"></i>
-                                <span>Lưu Kỳ Hiện Tại Vào MySQL</span>
-                            </div>
-                            <p class="text-xs text-gray-400 mt-1">Lưu bảng kết quả đang nhập kèm vector hóa 100 chiều và đặc trưng đầu đuôi câm.</p>
-                        </div>
-                        <button id="btnSaveToMySQLTab" class="w-full py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 font-bold text-xs text-white transition flex items-center justify-center space-x-1.5">
-                            <i data-lucide="database" class="w-3.5 h-3.5"></i>
-                            <span>Lưu Vào MySQL Ngay</span>
-                        </button>
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center space-x-2 text-amber-400 font-bold text-sm">
-                                <i data-lucide="file-code" class="w-4 h-4"></i>
-                                <span>Xuất File SQL Dữ Liệu</span>
-                            </div>
-                            <p class="text-xs text-gray-400 mt-1">Tải về tệp câu lệnh `INSERT INTO lottery_draws` để nhập vào phpMyAdmin / Workbench.</p>
-                        </div>
-                        <button id="btnExportSQL" class="w-full py-2 rounded-lg bg-amber-600 hover:bg-amber-500 font-bold text-xs text-white transition flex items-center justify-center space-x-1.5">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                            <span>Tải Tệp `du_lieu_xsmb.sql`</span>
-                        </button>
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center space-x-2 text-purple-400 font-bold text-sm">
-                                <i data-lucide="cpu" class="w-4 h-4"></i>
-                                <span>Tải Dataset Cho Deep Learning</span>
-                            </div>
-                            <p class="text-xs text-gray-400 mt-1">Xuất cấu trúc Tensor `(Lookback, 100)` định dạng JSON/CSV cho PyTorch / TensorFlow.</p>
-                        </div>
-                        <button id="btnExportAIDataset" class="w-full py-2 rounded-lg bg-purple-600 hover:bg-purple-500 font-bold text-xs text-white transition flex items-center justify-center space-x-1.5">
-                            <i data-lucide="brain" class="w-3.5 h-3.5"></i>
-                            <span>Tải `dataset_deep_learning.json`</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="p-5 rounded-xl bg-gray-900/90 border border-gray-800 space-y-4">
-                    <h3 class="font-bold text-sm text-gray-200 flex items-center space-x-2">
-                        <i data-lucide="workflow" class="w-4 h-4 text-amber-400"></i>
-                        <span>Quy Trình Huấn Luyện Mạng Nơ-ron Hồi Quy (LSTM / BiLSTM)</span>
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
-                        <div class="p-3 rounded-lg bg-gray-800 border border-gray-700 space-y-1">
-                            <span class="text-amber-400 font-bold">1. Vector Hóa 100 Số</span>
-                            <p class="text-gray-400">Mỗi ngày được mã hóa thành 1 vector nhị phân 100 chiều: $X_t \in \{0, 1\}^{100}$.</p>
-                        </div>
-                        <div class="p-3 rounded-lg bg-gray-800 border border-gray-700 space-y-1">
-                            <span class="text-cyan-400 font-bold">2. Trượt Cửa Sổ Lookback</span>
-                            <p class="text-gray-400">Ghép $T = 7$ ngày liên tiếp làm đầu vào: Tensor $X \in \mathbb{R}^{N \times 7 \times 100}$.</p>
-                        </div>
-                        <div class="p-3 rounded-lg bg-gray-800 border border-gray-700 space-y-1">
-                            <span class="text-purple-400 font-bold">3. Mạng Nơ-ron BiLSTM</span>
-                            <p class="text-gray-400">Mô hình học quy luật chu kỳ, độ gan và xác suất đồng xuất hiện (Loss: BCEWithLogits).</p>
-                        </div>
-                        <div class="p-3 rounded-lg bg-gray-800 border border-gray-700 space-y-1">
-                            <span class="text-emerald-400 font-bold">4. Dự Đoán Ngày Tiếp Theo</span>
-                            <p class="text-gray-400">Hàm Sigmoid xuất ra 100 xác suất $P(n_{t+1}) \in [0, 1]$ cho 100 con số.</p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-lg bg-gray-800/80 border border-gray-700 text-xs flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="terminal" class="w-4 h-4 text-green-400"></i>
-                            <span class="font-mono text-gray-300">Lệnh chạy huấn luyện AI: <strong class="text-green-400 font-mono">python train_deep_learning.py</strong></span>
-                        </div>
-                        <span class="text-gray-500">Hỗ trợ PyTorch, TensorFlow & NumPy</span>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Vector Nhị Phân 100 Chiều (00 - 99) Của Kỳ Quay Hiện Tại</h4>
-                    <div id="vectorInspectorBox" class="p-3 rounded-xl bg-gray-950 font-mono text-xs text-cyan-400 break-all border border-gray-800 max-h-24 overflow-y-auto">
-                        0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-                    </div>
+                <!-- Actions -->
+                <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pt-1 sm:pt-0">
+                    <button id="btnCopyFullSlip" class="py-2.5 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-black text-xs transition shadow-lg flex items-center justify-center space-x-1.5 active:scale-95">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span class="truncate">Copy Sổ Chốt</span>
+                    </button>
+                    <button id="btnPrintSlip" class="py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs text-gray-200 transition flex items-center justify-center space-x-1.5 active:scale-95">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        <span>In Phiếu</span>
+                    </button>
                 </div>
             </div>
-        </section>
 
-        <!-- TAB 6: QUẢN LÝ BỘ QUY TẮC BẠC NHỚ -->
-        <section id="tab-rules" class="tab-content hidden space-y-5">
-            <div class="glass-panel rounded-2xl p-5 border border-gray-800 space-y-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-gray-800">
-                    <div>
-                        <h2 class="font-bold text-gray-100 text-lg flex items-center space-x-2">
-                            <i data-lucide="book-open" class="w-5 h-5 text-amber-400"></i>
-                            <span>Cơ Sở Tri Thức & Quản Lý Quy Tắc Bạc Nhớ</span>
-                        </h2>
-                        <p class="text-xs text-gray-400">Bạn có thể tự do thêm, sửa các kinh nghiệm và bộ số huyền thoại của riêng bạn</p>
+            <!-- 4 Main Betting Categories Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                
+                <!-- MỤC 1: BAO LÔ TÔ (LÔ TÔ CÁC LOẠI) -->
+                <div class="p-4 rounded-2xl bg-gray-900/90 border border-amber-500/30 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                        <h4 class="font-bold text-sm text-amber-400 flex items-center space-x-2">
+                            <span>⭐ 1. BAO LÔ TÔ (CÁC LOẠI)</span>
+                        </h4>
+                        <button class="text-[11px] text-amber-400 hover:underline" onclick="window.copySection('baoLo')">Copy mục</button>
                     </div>
-
-                    <div class="flex items-center space-x-2">
-                        <button id="btnExportRules" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs text-gray-200 transition flex items-center space-x-1">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                            <span>Xuất JSON</span>
-                        </button>
-                        <button id="btnResetRules" class="px-3 py-1.5 rounded-lg bg-red-900/40 hover:bg-red-900/60 border border-red-700/50 text-xs text-red-300 transition flex items-center space-x-1">
-                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                            <span>Khôi Phục Gốc</span>
-                        </button>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
+                            <span class="text-gray-400 font-semibold">🌟 Bạch Thủ Lô VIP (1 con):</span>
+                            <span id="slipBTL" class="font-mono font-black text-base text-amber-300">--</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
+                            <span class="text-gray-400 font-semibold">💎 Song Thủ Lô VIP (1 cặp):</span>
+                            <span id="slipSTL" class="font-mono font-black text-sm text-cyan-300">--</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-gray-800/80 flex items-center justify-between">
+                            <span class="text-gray-400 font-semibold">🎯 Lô Kép Đẹp (2-3 con):</span>
+                            <span id="slipKep" class="font-mono font-bold text-sm text-purple-300">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">🔥 Dàn Lô 4 Số (Bất Bại):</span>
+                            <span id="slipDan4" class="font-mono font-black text-sm text-yellow-300 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">⚡ Dàn Lô 8 Số (Bao Khung):</span>
+                            <span id="slipDan8" class="font-mono font-bold text-xs text-emerald-300 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">📊 Dàn Lô 10 Số (Toàn Diện):</span>
+                            <span id="slipDan10" class="font-mono font-bold text-xs text-gray-300 tracking-wider">--</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-4 rounded-xl bg-gray-900/90 border border-gray-800 space-y-3">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">Thêm / Cập Nhật Quy Tắc Bạc Nhớ</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-[11px] text-gray-400 mb-1">Khi số này về (Ví dụ: 24):</label>
-                            <input type="text" id="ruleSourceNum" placeholder="24" maxlength="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-mono text-amber-300">
+                <!-- MỤC 2: LÔ XIÊN & XIÊN QUAY (CÁC LOẠI) -->
+                <div class="p-4 rounded-2xl bg-gray-900/90 border border-cyan-500/30 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                        <h4 class="font-bold text-sm text-cyan-400 flex items-center space-x-2">
+                            <span>🎯 2. LÔ XIÊN & XIÊN QUAY (CÁC LOẠI)</span>
+                        </h4>
+                        <button class="text-[11px] text-cyan-400 hover:underline" onclick="window.copySection('loXien')">Copy mục</button>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">🌟 3 Cặp Xiên 2 Hay Về:</span>
+                            <span id="slipXien2" class="font-mono font-black text-xs text-cyan-300 tracking-wide">--</span>
                         </div>
-                        <div class="sm:col-span-2">
-                            <label class="block text-[11px] text-gray-400 mb-1">Hôm sau báo các số (Ví dụ: 27, 72):</label>
-                            <div class="flex space-x-2">
-                                <input type="text" id="ruleTargetNums" placeholder="27, 72" class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-mono text-cyan-300">
-                                <button id="btnAddRule" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition">
-                                    Lưu Quy Tắc
-                                </button>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">💎 2 Cặp Xiên 3 Chuẩn Xác:</span>
+                            <span id="slipXien3" class="font-mono font-bold text-xs text-cyan-200 tracking-wide">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">🎯 1 Cặp Xiên 4 Đỉnh Cao:</span>
+                            <span id="slipXien4" class="font-mono font-bold text-xs text-cyan-100 tracking-wide">--</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-cyan-950/40 border border-cyan-500/30 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-cyan-300 font-bold">🔥 BỘ XIÊN QUAY 4 (Trọn Gói 11 Cặp):</span>
+                                <span id="slipXQCore" class="font-mono font-black text-cyan-400 text-xs">--</span>
+                            </div>
+                            <div id="slipXQDetails" class="text-[11px] text-gray-300 font-mono pl-1 leading-relaxed">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MỤC 3: GIẢI ĐẶC BIỆT & DÀN ĐỀ -->
+                <div class="p-4 rounded-2xl bg-gray-900/90 border border-pink-500/30 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                        <h4 class="font-bold text-sm text-pink-400 flex items-center space-x-2">
+                            <span>👑 3. GIẢI ĐẶC BIỆT (GĐB) & DÀN ĐỀ</span>
+                        </h4>
+                        <button class="text-[11px] text-pink-400 hover:underline" onclick="window.copySection('dacBiet')">Copy mục</button>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2 rounded-lg bg-gray-800/80">
+                                <span class="text-gray-400 font-semibold block text-[11px]">Đề Bạch Thủ VIP:</span>
+                                <span id="slipDeBTL" class="font-mono font-black text-base text-pink-300">--</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-gray-800/80">
+                                <span class="text-gray-400 font-semibold block text-[11px]">Đề Song Thủ:</span>
+                                <span id="slipDeSTL" class="font-mono font-black text-sm text-pink-200">--</span>
                             </div>
                         </div>
+                        <div class="p-2 rounded-lg bg-gray-800/80">
+                            <span class="text-gray-400 font-semibold block text-[11px]">Chạm & Tổng Đề Đẹp:</span>
+                            <span id="slipChamDe" class="font-mono font-bold text-xs text-pink-300">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">💎 Dàn Đề 10 Số (Đầu Bảng):</span>
+                            <span id="slipDanDe10" class="font-mono font-black text-xs text-pink-300 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">🔥 Dàn Đề 20 Số (Khung VIP):</span>
+                            <span id="slipDanDe20" class="font-mono font-bold text-xs text-pink-200 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">⚡ Dàn Đề 36 Số (Ăn Chắc):</span>
+                            <span id="slipDanDe36" class="font-mono font-bold text-xs text-pink-100 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">📊 Dàn Đề 64 Số (Bao Toàn Sàn):</span>
+                            <span id="slipDanDe64" class="font-mono font-bold text-xs text-gray-300 tracking-wider">--</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Danh Sách Quy Tắc Đang Kích Hoạt</h4>
-                    <div id="rulesListContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+                <!-- MỤC 4: BA CÀNG LÔ & BA CÀNG ĐỀ -->
+                <div class="p-4 rounded-2xl bg-gray-900/90 border border-purple-500/30 space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                        <h4 class="font-bold text-sm text-purple-400 flex items-center space-x-2">
+                            <span>🔮 4. BA CÀNG LÔ & BA CÀNG ĐỀ</span>
+                        </h4>
+                        <button class="text-[11px] text-purple-400 hover:underline" onclick="window.copySection('baCang')">Copy mục</button>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2 rounded-lg bg-gray-800/80">
+                            <span class="text-gray-400 font-semibold block text-[11px]">Càng Đẹp Nhất (Đầu Ghép 3 Càng):</span>
+                            <span id="slipTopCangs" class="font-mono font-black text-xs text-purple-300">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">⚡ 3 Càng Lô VIP (3 Con Sáng):</span>
+                            <span id="slip3CangLo" class="font-mono font-black text-xs text-purple-200 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">👑 3 Càng Đề VIP (Đặc Biệt):</span>
+                            <span id="slip3CangDe" class="font-mono font-black text-sm text-yellow-300 tracking-wider">--</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-gray-800/80 space-y-1">
+                            <span class="text-gray-400 font-semibold block">🔮 Dàn 3 Càng Đẹp (Ghép Bộ):</span>
+                            <span id="slipDan3Cang" class="font-mono font-bold text-xs text-purple-100 tracking-wider">--</span>
+                        </div>
+                    </div>
                 </div>
+
             </div>
-        </section>
+
+        </div>
 
     </main>
 
-    <!-- Detailed Reason Inspector Modal -->
-    <div id="reasonModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg rounded-2xl border border-gray-700 p-6 space-y-4 shadow-2xl animate-fade-in">
-            <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                <div class="flex items-center space-x-3">
-                    <div id="modalNumCircle" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-black font-black text-2xl shadow-lg">
-                        00
+    <!-- 🔐 MODAL ĐĂNG NHẬP & ĐĂNG KÝ THÀNH VIÊN VIP (CYBER-GOLD) -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-5 sm:p-7 border border-amber-500/40 bg-gray-950/95 shadow-2xl shadow-amber-500/10 space-y-5 animate-modal-in">
+            <div class="flex items-center justify-between border-b border-gray-800/90 pb-4">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-md shadow-amber-500/20">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-base text-gray-100">Chi Tiết Căn Cứ Dự Đoán</h3>
-                        <p id="modalScoreText" class="text-xs text-amber-400 font-semibold">Tổng điểm: 0đ</p>
+                        <h3 class="font-black text-base sm:text-lg bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">XÁC THỰC THÀNH VIÊN</h3>
+                        <p class="text-[11px] text-gray-400 font-medium">Bộ Số Huyền Thoại • Hệ Thống VIP</p>
                     </div>
                 </div>
-                <button id="btnCloseModal" class="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-gray-200 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div id="modalReasonsList" class="space-y-2 max-h-72 overflow-y-auto pr-1 text-xs"></div>
-
-            <div class="pt-2 text-right">
-                <button id="btnDoneModal" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-200 transition">
-                    Đóng
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Futuristic Toast Island Container -->
-    <div id="toastContainer"></div>
-
-    <!-- Ultra-Modern Cyber-Gold Draw Time Notification Modal -->
-    <div id="drawTimeNoticeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg rounded-3xl border border-amber-500/40 bg-gradient-to-b from-gray-900 via-gray-950 to-black p-6 sm:p-8 space-y-6 shadow-2xl animate-modal-in text-center relative overflow-hidden">
-            <!-- Background Multi-Layer Ambient Glow -->
-            <div class="absolute -top-16 -left-16 w-44 h-44 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-16 -right-16 w-44 h-44 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <!-- Glowing Holographic Radar Icon -->
-            <div class="relative mx-auto w-20 h-20 flex items-center justify-center">
-                <div class="orbital-pulse-ring w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-300 to-amber-600 flex items-center justify-center text-black shadow-2xl shadow-amber-500/30">
-                    <i data-lucide="clock" class="w-8 h-8 stroke-[2.5] text-gray-950"></i>
-                </div>
-            </div>
-
-            <!-- Title & Live Status Tag -->
-            <div class="space-y-2">
-                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                    <span>Chế độ bảo vệ kết quả thật</span>
-                </div>
-                <h3 class="font-extrabold text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-100 to-amber-500 uppercase tracking-wide">
-                    Chưa Đến Giờ Mở Thưởng!
-                </h3>
-                <p class="text-xs text-gray-400 max-w-sm mx-auto leading-relaxed">
-                    Hội đồng Xổ số Miền Bắc chỉ quay thưởng trực tiếp theo lịch mở thưởng quốc gia cố định:
-                </p>
-            </div>
-
-            <!-- High-Tech Schedule Timeline -->
-            <div class="grid grid-cols-3 gap-2 py-1">
-                <div class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 space-y-1">
-                    <div class="text-[10px] text-gray-500 font-bold uppercase">Bắt đầu quay</div>
-                    <div class="text-xs font-mono font-extrabold text-amber-400">18h15</div>
-                    <div class="text-[9px] text-gray-400">Quay 27 giải</div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-gray-900/80 border border-amber-500/30 space-y-1 relative">
-                    <span class="absolute -top-1.5 right-2 px-1.5 py-0.2 rounded bg-amber-500 text-[8px] font-black text-black">QUAN TRỌNG</span>
-                    <div class="text-[10px] text-gray-500 font-bold uppercase">Giải Đặc Biệt</div>
-                    <div class="text-xs font-mono font-extrabold text-cyan-300">18h30</div>
-                    <div class="text-[9px] text-gray-400">Có kết quả đủ</div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-gray-900/80 border border-purple-500/30 space-y-1">
-                    <div class="text-[10px] text-gray-500 font-bold uppercase">AI Chốt Số</div>
-                    <div class="text-xs font-mono font-extrabold text-purple-300">18h32</div>
-                    <div class="text-[9px] text-gray-400">Bắn Telegram VIP</div>
-                </div>
-            </div>
-
-            <!-- Current Time vs Draw Date Card -->
-            <div class="p-4 rounded-2xl bg-gray-950/90 border border-gray-800 space-y-2.5 text-left text-xs">
-                <div class="flex items-center justify-between pb-2 border-b border-gray-800/80">
-                    <span class="text-gray-400 flex items-center space-x-1.5">
-                        <i data-lucide="radio" class="w-3.5 h-3.5 text-cyan-400"></i>
-                        <span>Giờ Việt Nam hiện tại:</span>
-                    </span>
-                    <span id="modalCurrentVNTime" class="font-bold text-cyan-300 font-mono text-sm tracking-wider">--:--:-- (VN)</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-400 flex items-center space-x-1.5">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-yellow-400"></i>
-                        <span>Kỳ quay được chọn:</span>
-                    </span>
-                    <span id="modalSelectedDate" class="font-bold text-amber-300 font-mono text-sm">--/--/----</span>
-                </div>
-            </div>
-
-            <!-- Action Button -->
-            <button id="btnCloseTimeNoticeModal" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold text-xs uppercase tracking-wider transition-all duration-300 shadow-xl shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                <i data-lucide="check-circle-2" class="w-4 h-4 text-black stroke-[2.5]"></i>
-                <span>Đã Hiểu & Sẽ Quay Lại Sau 18h30</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Reusable Cyber Confirmation Modal (Thay thế hoàn toàn confirm trình duyệt) -->
-    <div id="cyberConfirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-sm rounded-3xl border border-amber-500/40 bg-gradient-to-b from-gray-900 via-gray-950 to-black p-6 space-y-5 shadow-2xl animate-modal-in text-center relative overflow-hidden">
-            <div class="mx-auto w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <i data-lucide="help-circle" class="w-7 h-7 stroke-[2.5]"></i>
-            </div>
-            <div class="space-y-1.5">
-                <h4 class="font-extrabold text-base text-gray-100 uppercase tracking-wide">Xác Nhận Hành Động</h4>
-                <p id="cyberConfirmMessage" class="text-xs text-gray-300 leading-relaxed font-medium">...</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2.5 pt-1">
-                <button id="btnCyberConfirmCancel" class="py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-bold text-gray-300 transition">
-                    Hủy Bỏ
-                </button>
-                <button id="btnCyberConfirmOk" class="py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold text-xs transition shadow-lg">
-                    Đồng Ý
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ☁️ MODAL CẤU HÌNH & ĐỒNG BỘ MÁY CHỦ CLOUD (RENDER / WEB / ĐIỆN THOẠI) -->
-    <div id="cloudConfigModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-cyan-500/40 bg-gray-900 shadow-2xl space-y-4 animate-modal-in">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                <div class="flex items-center space-x-2">
-                    <span class="text-2xl">☁️</span>
-                    <div>
-                        <h3 class="font-bold text-gray-100 text-base">Đồng Bộ Cloud Render (Web & App)</h3>
-                        <p class="text-[11px] text-gray-400">Kết nối App Desktop với Máy chủ Cloud để tự động cập nhật số</p>
-                    </div>
-                </div>
-                <button id="btnCloseCloudModal" class="p-1.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <p class="text-gray-300 leading-relaxed">
-                    Khi bạn cào số hoặc lưu trên <strong>Điện Thoại / Web</strong>, máy chủ Cloud sẽ ghi nhận. App Desktop sẽ tự động kéo dữ liệu về để khớp nhau 100%.
-                </p>
-
-                <div class="space-y-1">
-                    <label class="block text-gray-400 font-semibold">Địa chỉ Máy Chủ Cloud Render:</label>
-                    <input type="text" id="inputCloudServerUrl" placeholder="https://bo-so-huyen-thoai-master.onrender.com" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500">
-                </div>
-
-                <div id="cloudPingResult" class="p-3 rounded-xl bg-gray-950/80 border border-gray-800 text-[11px] text-gray-400 space-y-1">
-                    <div>Trạng thái kết nối: <span id="cloudPingText" class="font-bold text-emerald-400">Đang kiểm tra...</span></div>
-                    <div id="cloudServerTimeText" class="text-gray-500 text-[10px]">Thời gian máy chủ: --</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <button id="btnTestAndSaveCloud" class="py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition flex items-center justify-center space-x-1.5 shadow-lg shadow-cyan-600/20">
-                    <i data-lucide="check" class="w-4 h-4"></i>
-                    <span>Lưu & Kết Nối</span>
-                </button>
-                <button id="btnSyncNowCloud" class="py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold text-xs transition flex items-center justify-center space-x-1.5 shadow-lg shadow-amber-500/20">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                    <span>Đồng Bộ Ngay</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📱 MOBILE BOTTOM NAVIGATION BAR (Dành riêng cho màn hình Điện Thoại) -->
-    <div id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/90 px-3 py-2 flex items-center justify-around text-[10px] font-medium shadow-2xl safe-area-pb">
-        <button class="mobile-nav-btn active flex flex-col items-center py-1 px-2.5 text-amber-400 font-bold transition" data-target="tab-predict">
-            <i data-lucide="sparkles" class="w-5 h-5 mb-0.5"></i>
-            <span>Sổ Chốt VIP</span>
-        </button>
-        <button class="mobile-nav-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-amber-300 transition" data-target="tab-history">
-            <i data-lucide="history" class="w-5 h-5 mb-0.5"></i>
-            <span>Tra Cứu</span>
-        </button>
-        <button class="mobile-nav-btn admin-tab-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-cyan-300 transition" data-target="tab-matrix">
-            <i data-lucide="grid" class="w-5 h-5 mb-0.5"></i>
-            <span>Ma Trận</span>
-        </button>
-        <button class="mobile-nav-btn admin-tab-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-purple-300 transition" data-target="tab-board">
-            <i data-lucide="table" class="w-5 h-5 mb-0.5"></i>
-            <span>Đầu Đuôi</span>
-        </button>
-        <button class="mobile-nav-btn admin-tab-btn flex flex-col items-center py-1 px-2.5 text-gray-400 hover:text-blue-300 transition" data-target="tab-mysql">
-            <i data-lucide="database" class="w-5 h-5 mb-0.5"></i>
-            <span>Dataset</span>
-        </button>
-    </div>
-
-    <!-- 🛡️ MODAL ĐĂNG NHẬP & ĐĂNG KÝ BẢO MẬT (CYBER-GOLD AUTH GATE) -->
-    <div id="authModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-amber-500/40 bg-gray-950/95 shadow-2xl shadow-amber-500/10 animate-modal-in space-y-5">
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-                <div class="flex items-center space-x-3">
-                    <img src="icon.png" alt="Logo" class="w-10 h-10 rounded-xl border border-amber-500/40 object-cover">
-                    <div>
-                        <h3 class="text-base font-extrabold bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">BỘ SỐ HUYỀN THOẠI</h3>
-                        <p class="text-[11px] text-gray-400">Hệ Thống Phân Quyền Thương Mại VIP</p>
-                    </div>
-                </div>
-                <button id="btnCloseAuthModal" class="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-gray-800 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button id="btnCloseAuthModal" class="p-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
             <!-- Tab Switcher: Đăng Nhập vs Đăng Ký -->
-            <div class="flex rounded-xl bg-gray-900 p-1 border border-gray-800 text-xs font-bold">
-                <button id="tabAuthLoginBtn" type="button" class="flex-1 py-2 rounded-lg bg-amber-500 text-black shadow transition">
+            <div class="flex rounded-2xl bg-gray-900/90 p-1 border border-gray-800 text-xs font-bold">
+                <button id="tabAuthLoginBtn" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-md transition font-black">
                     Đăng Nhập
                 </button>
-                <button id="tabAuthRegisterBtn" type="button" class="flex-1 py-2 rounded-lg text-gray-400 hover:text-gray-200 transition">
+                <button id="tabAuthRegisterBtn" class="flex-1 py-2 rounded-xl text-gray-400 hover:text-gray-200 transition">
                     Đăng Ký Khách VIP
                 </button>
             </div>
 
-            <!-- Form Error Box -->
-            <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-950/80 border border-rose-500/40 text-xs text-rose-300 items-start space-x-2">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5"></i>
-                <span id="authErrorText">Thông tin không chính xác</span>
+            <!-- Error Banner -->
+            <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs font-medium space-y-1">
+                <div class="flex items-center space-x-1.5 font-bold text-rose-400">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span>Thông Báo Lỗi:</span>
+                </div>
+                <p id="authErrorText" class="pl-5 text-[11px] leading-relaxed">Thông tin không chính xác.</p>
             </div>
 
-            <!-- Tab 1: Form Đăng Nhập -->
+            <!-- Form 1: Đăng Nhập -->
             <form id="formLogin" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Tên đăng nhập (Username):</label>
-                    <input type="text" id="loginUsername" required autocomplete="username" placeholder="Nhập tài khoản (admin / loc889999...)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Mật khẩu:</label>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">Tên Đăng Nhập / Tài Khoản:</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Nhập mật khẩu..." class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
-                        <button type="button" id="btnToggleLoginPwd" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-200">
+                        <input type="text" id="loginUsername" required placeholder="Nhập tài khoản (admin hoặc user)..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition auth-input-glow font-mono">
+                        <i data-lucide="user" class="w-4 h-4 text-gray-500 absolute left-3 top-3"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">Mật Khẩu:</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="Nhập mật khẩu..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition auth-input-glow font-mono">
+                        <i data-lucide="key-round" class="w-4 h-4 text-gray-500 absolute left-3 top-3"></i>
+                        <button type="button" id="btnToggleLoginPwd" class="absolute right-3 top-3 text-gray-500 hover:text-gray-300">
                             <i data-lucide="eye" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
-                <button type="submit" id="btnSubmitLogin" class="btn-gradient-primary w-full py-3 rounded-xl font-black text-black text-sm tracking-wide uppercase flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i>
-                    <span>Đăng Nhập Hệ Thống</span>
-                </button>
+
+                <div class="pt-2">
+                    <button type="submit" id="btnSubmitLogin" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-black text-xs sm:text-sm tracking-wide transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center space-x-2">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Đăng Nhập Hệ Thống</span>
+                    </button>
+                </div>
             </form>
 
-            <!-- Tab 2: Form Đăng Ký Thành Viên VIP -->
+            <!-- Form 2: Đăng Ký Khách Hàng VIP -->
             <form id="formRegister" class="hidden space-y-3.5">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Họ & Tên / Biệt danh:</label>
-                    <input type="text" id="regFullName" placeholder="Ví dụ: Anh Lộc VIP, Phát Tài 88..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition">
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Họ & Tên (Khách VIP):</label>
+                    <input type="text" id="regFullName" required placeholder="Ví dụ: Nguyễn Văn Phát Lộc" class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition">
                 </div>
+
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Tên đăng nhập muốn tạo:</label>
-                    <input type="text" id="regUsername" required autocomplete="username" placeholder="Chữ và số viết liền (ví dụ: khachvip1)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Tên Đăng Nhập Tự Chọn:</label>
+                    <input type="text" id="regUsername" required placeholder="Ít nhất 3 ký tự (chữ hoặc số)..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition font-mono">
                 </div>
+
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Mật khẩu (Ít nhất 6 ký tự):</label>
-                    <input type="password" id="regPassword" required autocomplete="new-password" placeholder="Nhập mật khẩu an toàn..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Mật Khẩu:</label>
+                    <input type="password" id="regPassword" required placeholder="Tối thiểu 6 ký tự..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition font-mono">
                 </div>
+
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Nhập lại mật khẩu:</label>
-                    <input type="password" id="regPasswordConfirm" required autocomplete="new-password" placeholder="Xác nhận lại mật khẩu..." class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500 transition font-mono">
+                    <label class="block text-xs font-bold text-gray-300 mb-1">Xác Nhận Lại Mật Khẩu:</label>
+                    <input type="password" id="regPasswordConfirm" required placeholder="Nhập lại mật khẩu..." class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-amber-300 focus:outline-none focus:border-amber-500 transition font-mono">
                 </div>
-                <button type="submit" id="btnSubmitRegister" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 font-black text-black text-sm tracking-wide uppercase flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i>
-                    <span>Tạo Tài Khoản VIP</span>
-                </button>
+
+                <div class="pt-2">
+                    <button type="submit" id="btnSubmitRegister" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black text-xs sm:text-sm tracking-wide transition shadow-lg active:scale-95 flex items-center justify-center space-x-2">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Tạo Tài Khoản Khách VIP</span>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
+
+    <!-- Cloud Config Modal -->
+    <div id="cloudConfigModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 border border-cyan-500/40 bg-gray-950/90 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">☁️</span>
+                    <h3 class="font-black text-base text-cyan-400">Cấu Hình Cloud Master Server</h3>
+                </div>
+                <button id="btnCloseCloudModal" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-300">Địa chỉ Máy chủ Cloud:</label>
+                <input type="text" id="inputCloudServerUrl" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-cyan-300 font-mono">
+                <p id="cloudPingText" class="text-[11px] text-gray-400">Đang kiểm tra kết nối...</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button id="btnTestAndSaveCloud" class="py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition">Lưu & Kết Nối</button>
+                <button id="btnSyncNowCloud" class="py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition">Đồng Bộ Ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
     <!-- Scripts -->
     <script src="data.js"></script>
     <script src="rules.js"></script>
     <script src="engine.js"></script>
     <script src="app.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        });
-    </script>
 </body>
 </html>

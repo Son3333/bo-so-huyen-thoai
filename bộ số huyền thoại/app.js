@@ -345,13 +345,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkDailyLockStatus() {
-        const selectedDate = inputDrawDate.value || todayVN;
+        const selectedDate = (inputDrawDate && inputDrawDate.value) ? inputDrawDate.value : todayVN;
         const lockedDays = getLockedDays();
         const lockedData = lockedDays[selectedDate];
 
         if (lockedData) {
-            dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
-            dailyLockStatusText.textContent = `🔒 Đã Chốt Ngày ${selectedDate}`;
+            if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
+            if (dailyLockStatusText) dailyLockStatusText.textContent = `🔒 Đã Chốt Ngày ${selectedDate}`;
             if (drawDateTag) drawDateTag.textContent = '🔒 Đã Chốt Số Cố Định';
             if (btnRunText) btnRunText.textContent = 'Xem Lại Bản Chốt Cố Định';
 
@@ -360,12 +360,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const latestLocked = getLatestLockedDay();
             if (latestLocked && !isCurrentUserAdmin()) {
                 // Tự động nạp Sổ chốt mới nhất cho khách VIP xem ngay
-                dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
-                dailyLockStatusText.textContent = `🔒 Sổ Chốt Mới Nhất (${latestLocked.drawDate})`;
+                if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/50 text-xs font-bold text-amber-300 items-center space-x-1.5';
+                if (dailyLockStatusText) dailyLockStatusText.textContent = `🔒 Sổ Chốt Mới Nhất (${latestLocked.drawDate})`;
                 renderLockedPrediction(latestLocked);
             } else {
-                dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 items-center space-x-1.5';
-                dailyLockStatusText.textContent = `🟢 Sẵn sàng nhập kỳ ${selectedDate}`;
+                if (dailyLockBadge) dailyLockBadge.className = 'hidden md:flex px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-bold text-emerald-300 items-center space-x-1.5';
+                if (dailyLockStatusText) dailyLockStatusText.textContent = `🟢 Sẵn sàng nhập kỳ ${selectedDate}`;
                 if (drawDateTag) drawDateTag.textContent = 'Kỳ mới';
                 if (btnRunText) btnRunText.textContent = 'Tự Học & Chốt Số Ngày Mai';
                 
@@ -377,34 +377,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetPredictionDisplay() {
-        resBachThu.textContent = '--';
-        btlScoreBadge.textContent = '0đ';
-        resSongThu.textContent = '-- - --';
+        if (resBachThu) resBachThu.textContent = '--';
+        if (btlScoreBadge) btlScoreBadge.textContent = '0đ';
+        if (resSongThu) resSongThu.textContent = '-- - --';
         if (resDeBTL) resDeBTL.textContent = '--';
         if (res3CangVIP) res3CangVIP.textContent = '--';
         
-        slipBTL.textContent = '--';
-        slipSTL.textContent = '--';
-        slipKep.textContent = '--';
-        slipDan4.textContent = '--';
-        slipDan8.textContent = '--';
-        slipDan10.textContent = '--';
-        slipXien2.textContent = '--';
-        slipXien3.textContent = '--';
-        slipXien4.textContent = '--';
-        slipXQCore.textContent = '--';
-        slipXQDetails.textContent = '--';
-        slipDeBTL.textContent = '--';
-        slipDeSTL.textContent = '--';
-        slipChamDe.textContent = '--';
-        slipDanDe10.textContent = '--';
-        slipDanDe20.textContent = '--';
-        slipDanDe36.textContent = '--';
-        slipDanDe64.textContent = '--';
-        slipTopCangs.textContent = '--';
-        slip3CangLo.textContent = '--';
-        slip3CangDe.textContent = '--';
-        slipDan3Cang.textContent = '--';
+        if (slipBTL) slipBTL.textContent = '--';
+        if (slipSTL) slipSTL.textContent = '--';
+        if (slipKep) slipKep.textContent = '--';
+        if (slipDan4) slipDan4.textContent = '--';
+        if (slipDan8) slipDan8.textContent = '--';
+        if (slipDan10) slipDan10.textContent = '--';
+        if (slipXien2) slipXien2.textContent = '--';
+        if (slipXien3) slipXien3.textContent = '--';
+        if (slipXien4) slipXien4.textContent = '--';
+        if (slipXQCore) slipXQCore.textContent = '--';
+        if (slipXQDetails) slipXQDetails.textContent = '--';
+        if (slipDeBTL) slipDeBTL.textContent = '--';
+        if (slipDeSTL) slipDeSTL.textContent = '--';
+        if (slipChamDe) slipChamDe.textContent = '--';
+        if (slipDanDe10) slipDanDe10.textContent = '--';
+        if (slipDanDe20) slipDanDe20.textContent = '--';
+        if (slipDanDe36) slipDanDe36.textContent = '--';
+        if (slipDanDe64) slipDanDe64.textContent = '--';
+        if (slipTopCangs) slipTopCangs.textContent = '--';
+        if (slip3CangLo) slip3CangLo.textContent = '--';
+        if (slip3CangDe) slip3CangDe.textContent = '--';
+        if (slipDan3Cang) slipDan3Cang.textContent = '--';
     }
 
     function renderLockedPrediction(lockedData) {
@@ -847,21 +847,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- INPUT MODE TOGGLE ---
-    modeQuickBtn.addEventListener('click', () => {
-        currentMode = 'quick';
-        modeQuickBtn.className = 'flex-1 py-1.5 rounded-lg bg-amber-500 font-semibold text-black transition shadow';
-        modeFullBtn.className = 'flex-1 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 font-medium transition';
-        quickInputContainer.classList.remove('hidden');
-        fullBoardContainer.classList.add('hidden');
-    });
+    if (modeQuickBtn && modeFullBtn) {
+        modeQuickBtn.addEventListener('click', () => {
+            currentMode = 'quick';
+            modeQuickBtn.className = 'flex-1 py-1.5 rounded-lg bg-amber-500 font-semibold text-black transition shadow';
+            modeFullBtn.className = 'flex-1 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 font-medium transition';
+            if (quickInputContainer) quickInputContainer.classList.remove('hidden');
+            if (fullBoardContainer) fullBoardContainer.classList.add('hidden');
+        });
 
-    modeFullBtn.addEventListener('click', () => {
-        currentMode = 'full';
-        modeFullBtn.className = 'flex-1 py-1.5 rounded-lg bg-amber-500 font-semibold text-black transition shadow';
-        modeQuickBtn.className = 'flex-1 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 font-medium transition';
-        fullBoardContainer.classList.remove('hidden');
-        quickInputContainer.classList.add('hidden');
-    });
+        modeFullBtn.addEventListener('click', () => {
+            currentMode = 'full';
+            modeFullBtn.className = 'flex-1 py-1.5 rounded-lg bg-amber-500 font-semibold text-black transition shadow';
+            modeQuickBtn.className = 'flex-1 py-1.5 rounded-lg text-gray-400 hover:text-gray-200 font-medium transition';
+            if (fullBoardContainer) fullBoardContainer.classList.remove('hidden');
+            if (quickInputContainer) quickInputContainer.classList.add('hidden');
+        });
+    }
 
     // --- QUICK PASTE FROM CLIPBOARD (TIỆN LỢI CHO ĐIỆN THOẠI) ---
     const btnPasteClipboard = document.getElementById('btnPasteClipboard');
@@ -871,23 +873,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (navigator.clipboard && navigator.clipboard.readText) {
                     const text = await navigator.clipboard.readText();
                     if (text && text.trim()) {
-                        quickInputText.value = text.trim();
+                        if (quickInputText) quickInputText.value = text.trim();
                         const lottoNums = engine.parseQuickInput(text);
-                        quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
+                        if (quickCountBadge) quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
                         showToast(`📋 Đã dán nhanh ${lottoNums.length} số từ bộ nhớ tạm!`, "success");
                         return;
                     }
                 }
             } catch (e) {}
-            quickInputText.focus();
+            if (quickInputText) quickInputText.focus();
             showToast("Hãy nhấn giữ vào ô nhập và chọn 'Dán' (Paste)", "info");
         });
     }
 
-    quickInputText.addEventListener('input', () => {
-        const lottoNums = engine.parseQuickInput(quickInputText.value);
-        quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
-    });
+    if (quickInputText) {
+        quickInputText.addEventListener('input', () => {
+            const lottoNums = engine.parseQuickInput(quickInputText.value);
+            if (quickCountBadge) quickCountBadge.textContent = `Đã nhận: ${lottoNums.length} số`;
+        });
+    }
 
     // --- DRAW TIME NOTICE MODAL & AUTO-FETCH ---
     const drawTimeNoticeModal = document.getElementById('drawTimeNoticeModal');
@@ -1109,16 +1113,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    btnClearInput.addEventListener('click', () => {
-        quickInputText.value = '';
-        quickCountBadge.textContent = `Đã nhận: 0 số`;
-        const inputs = fullBoardContainer.querySelectorAll('input');
-        inputs.forEach(i => i.value = '');
-        showToast("Đã xóa trắng bảng nhập liệu", "info");
-    });
+    if (btnClearInput) {
+        btnClearInput.addEventListener('click', () => {
+            if (quickInputText) quickInputText.value = '';
+            if (quickCountBadge) quickCountBadge.textContent = `Đã nhận: 0 số`;
+            if (fullBoardContainer) {
+                const inputs = fullBoardContainer.querySelectorAll('input');
+                inputs.forEach(i => i.value = '');
+            }
+            showToast("Đã xóa trắng bảng nhập liệu", "info");
+        });
+    }
 
     // --- MAIN PREDICTION & IDEMPOTENT LOCK HANDLER ---
-    btnRunPrediction.addEventListener('click', runPrediction);
+    if (btnRunPrediction) {
+        btnRunPrediction.addEventListener('click', runPrediction);
+    }
 
     function runPrediction() {
         const selectedDate = inputDrawDate.value || todayVN;
@@ -1464,57 +1474,61 @@ document.addEventListener('DOMContentLoaded', () => {
         if (slipTargetDateSub) slipTargetDateSub.textContent = formatDateVN(targetPlayDate);
         if (slipBaseDateText) slipBaseDateText.textContent = formatDateVN(baseDate);
 
-        slipBTL.textContent = b.btl || '--';
-        slipSTL.textContent = (b.stl && b.stl.join(' - ')) || '--';
-        slipKep.textContent = (b.topKep && b.topKep.join(', ')) || '00, 11';
-        slipDan4.textContent = (b.dan4 && b.dan4.join(' - ')) || '--';
-        slipDan8.textContent = (b.dan8 && b.dan8.join(' - ')) || '--';
-        slipDan10.textContent = (b.dan10 && b.dan10.join(', ')) || '--';
+        if (slipBTL) slipBTL.textContent = b.btl || '--';
+        if (slipSTL) slipSTL.textContent = (b.stl && b.stl.join(' - ')) || '--';
+        if (slipKep) slipKep.textContent = (b.topKep && b.topKep.join(', ')) || '00, 11';
+        if (slipDan4) slipDan4.textContent = (b.dan4 && b.dan4.join(' - ')) || '--';
+        if (slipDan8) slipDan8.textContent = (b.dan8 && b.dan8.join(' - ')) || '--';
+        if (slipDan10) slipDan10.textContent = (b.dan10 && b.dan10.join(', ')) || '--';
 
-        slipXien2.textContent = (x.xien2 && x.xien2.map(i => `(${i.join('-')})`).join('   ')) || '--';
-        slipXien3.textContent = (x.xien3 && x.xien3.map(i => `(${i.join('-')})`).join('   ')) || '--';
-        slipXien4.textContent = (x.xien4 && x.xien4.map(i => `(${i.join('-')})`).join('   ')) || '--';
-        slipXQCore.textContent = x.xienQuay4 ? `[${x.xienQuay4.join(', ')}]` : '--';
+        if (slipXien2) slipXien2.textContent = (x.xien2 && x.xien2.map(i => `(${i.join('-')})`).join('   ')) || '--';
+        if (slipXien3) slipXien3.textContent = (x.xien3 && x.xien3.map(i => `(${i.join('-')})`).join('   ')) || '--';
+        if (slipXien4) slipXien4.textContent = (x.xien4 && x.xien4.map(i => `(${i.join('-')})`).join('   ')) || '--';
+        if (slipXQCore) slipXQCore.textContent = x.xienQuay4 ? `[${x.xienQuay4.join(', ')}]` : '--';
 
-        if (x.xienQuayPairs && x.xienQuayTriplets && x.xienQuay4) {
-            let xqHTML = `<div class="font-bold text-amber-300 mb-1">• 6 Cặp Xiên 2:</div> ${x.xienQuayPairs.join(' | ')}<br>`;
-            xqHTML += `<div class="font-bold text-purple-300 my-1">• 4 Bộ Xiên 3:</div> ${x.xienQuayTriplets.join(' | ')}<br>`;
-            xqHTML += `<div class="font-bold text-pink-300 my-1">• 1 Bộ Xiên 4:</div> (${x.xienQuay4.join('-')})`;
-            slipXQDetails.innerHTML = xqHTML;
-        } else {
-            slipXQDetails.textContent = '--';
+        if (slipXQDetails) {
+            if (x.xienQuayPairs && x.xienQuayTriplets && x.xienQuay4) {
+                let xqHTML = `<div class="font-bold text-amber-300 mb-1">• 6 Cặp Xiên 2:</div> ${x.xienQuayPairs.join(' | ')}<br>`;
+                xqHTML += `<div class="font-bold text-purple-300 my-1">• 4 Bộ Xiên 3:</div> ${x.xienQuayTriplets.join(' | ')}<br>`;
+                xqHTML += `<div class="font-bold text-pink-300 my-1">• 1 Bộ Xiên 4:</div> (${x.xienQuay4.join('-')})`;
+                slipXQDetails.innerHTML = xqHTML;
+            } else {
+                slipXQDetails.textContent = '--';
+            }
         }
 
-        slipDeBTL.textContent = d.deBTL || '--';
-        slipDeSTL.textContent = (d.deSTL && d.deSTL.join(' - ')) || '--';
-        slipChamDe.textContent = `Chạm [${(d.chamDe && d.chamDe.join(', ')) || '--'}] | Tổng [${(d.topSums && d.topSums.join(', ')) || '--'}]`;
-        slipDanDe10.textContent = (d.danDe10 && d.danDe10.join(', ')) || '--';
-        slipDanDe20.textContent = (d.danDe20 && d.danDe20.join(', ')) || '--';
-        slipDanDe36.textContent = (d.danDe36 && d.danDe36.join(', ')) || '--';
-        slipDanDe64.textContent = (d.danDe64 && d.danDe64.join(', ')) || '--';
+        if (slipDeBTL) slipDeBTL.textContent = d.deBTL || '--';
+        if (slipDeSTL) slipDeSTL.textContent = (d.deSTL && d.deSTL.join(' - ')) || '--';
+        if (slipChamDe) slipChamDe.textContent = `Chạm [${(d.chamDe && d.chamDe.join(', ')) || '--'}] | Tổng [${(d.topSums && d.topSums.join(', ')) || '--'}]`;
+        if (slipDanDe10) slipDanDe10.textContent = (d.danDe10 && d.danDe10.join(', ')) || '--';
+        if (slipDanDe20) slipDanDe20.textContent = (d.danDe20 && d.danDe20.join(', ')) || '--';
+        if (slipDanDe36) slipDanDe36.textContent = (d.danDe36 && d.danDe36.join(', ')) || '--';
+        if (slipDanDe64) slipDanDe64.textContent = (d.danDe64 && d.danDe64.join(', ')) || '--';
 
-        slipTopCangs.textContent = `Càng [${(c.topCangs && c.topCangs.join(', ')) || '--'}]`;
-        slip3CangLo.textContent = (c.baCangLoVIP && c.baCangLoVIP.join(' - ')) || '--';
-        slip3CangDe.textContent = (c.baCangDeVIP && c.baCangDeVIP.join(' - ')) || '--';
-        slipDan3Cang.textContent = (c.danBaCang && c.danBaCang.join(', ')) || '--';
+        if (slipTopCangs) slipTopCangs.textContent = `Càng [${(c.topCangs && c.topCangs.join(', ')) || '--'}]`;
+        if (slip3CangLo) slip3CangLo.textContent = (c.baCangLoVIP && c.baCangLoVIP.join(' - ')) || '--';
+        if (slip3CangDe) slip3CangDe.textContent = (c.baCangDeVIP && c.baCangDeVIP.join(' - ')) || '--';
+        if (slipDan3Cang) slipDan3Cang.textContent = (c.danBaCang && c.danBaCang.join(', ')) || '--';
 
         if (resDeBTL) resDeBTL.textContent = d.deBTL || '--';
         if (res3CangVIP) res3CangVIP.textContent = (c.baCangLoVIP && c.baCangLoVIP.slice(0, 2).join(', ')) || '--';
     }
 
     // --- COPY & PRINT FULL SLIP ---
-    btnCopyFullSlip.addEventListener('click', () => {
-        if (!lastFullBettingSlip) {
-            showToast("Chưa có sổ chốt số để copy!");
-            return;
-        }
-        const text = formatSlipToText(lastFullBettingSlip);
-        navigator.clipboard.writeText(text).then(() => {
-            showToast("📋 Đã sao chép toàn bộ Sổ Tay Chốt Số vào Clipboard!");
-        }).catch(() => {
-            showToast("Đã copy sổ chốt!");
+    if (btnCopyFullSlip) {
+        btnCopyFullSlip.addEventListener('click', () => {
+            if (!lastFullBettingSlip) {
+                showToast("Chưa có sổ chốt số để copy!");
+                return;
+            }
+            const text = formatSlipToText(lastFullBettingSlip);
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("📋 Đã sao chép toàn bộ Sổ Tay Chốt Số vào Clipboard!");
+            }).catch(() => {
+                showToast("Đã copy sổ chốt!");
+            });
         });
-    });
+    }
 
     function formatSlipToText(s) {
         if (!s) return '';
@@ -1589,9 +1603,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    btnPrintSlip.addEventListener('click', () => {
-        window.print();
-    });
+    if (btnPrintSlip) {
+        btnPrintSlip.addEventListener('click', () => {
+            window.print();
+        });
+    }
 
     // --- RENDER EVALUATION & LEARNING REPORT ---
     function renderEvaluationReport(evalResult, learningEntry) {
@@ -1930,15 +1946,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeModal() {
-        reasonModal.classList.add('hidden');
-        reasonModal.classList.remove('flex');
+        if (reasonModal) {
+            reasonModal.classList.add('hidden');
+            reasonModal.classList.remove('flex');
+        }
     }
 
-    btnCloseModal.addEventListener('click', closeModal);
-    btnDoneModal.addEventListener('click', closeModal);
-    reasonModal.addEventListener('click', (e) => {
-        if (e.target === reasonModal) closeModal();
-    });
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
+    if (btnDoneModal) btnDoneModal.addEventListener('click', closeModal);
+    if (reasonModal) {
+        reasonModal.addEventListener('click', (e) => {
+            if (e.target === reasonModal) closeModal();
+        });
+    }
 
     // --- MYSQL & DEEP LEARNING ACTIONS ---
     function handleSaveToMySQL() {
